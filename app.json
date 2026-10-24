@@ -9,7 +9,7 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.mahdibelaifa.dashboard"
+      "bundleIdentifier": "app.cranberry686.monkey5896"
     },
     "android": {
       "adaptiveIcon": {
