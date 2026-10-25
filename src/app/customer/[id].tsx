@@ -1,63 +1,79 @@
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
-import { api, dzd, fmtDate, waNumber } from '../../lib/api';
-import { C, Card, s, StatusPill } from '../../components/ui';
+import { api, dzd, fmtDate, orderTotalOf, waNumber } from '../../lib/api';
+import { BOTTOM_PAD, C, Card, KV, s, StatusPill } from '../../components/ui';
 
 export default function CustomerDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const [cust, setCust] = useState<any>(null);
+  const [customer, setCustomer] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
   const load = useCallback(async () => {
     try {
-      const [all, or] = await Promise.all([api.customers(), api.customerOrders(id!)]);
-      setCust(all.find((x) => x.id === id) || null);
-      setOrders(Array.isArray(or) ? or : []);
-    } catch { /* keep */ }
+      const [all, ords] = await Promise.all([api.customers(), api.customerOrders(id).catch(() => [])]);
+      setCustomer(all.find((c) => c.id === id) || null);
+      setOrders(Array.isArray(ords) ? ords : []);
+    } catch { /* ignore */ }
     setLoading(false);
   }, [id]);
-  useFocusEffect(useCallback(() => { load(); }, [load]));
+  useEffect(() => { load(); }, [load]);
 
   if (loading) return <View style={[s.screen, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={C.accent} /></View>;
-  if (!cust) return <View style={s.screen}><Text style={[s.sub, { padding: 16 }]}>العميل غير موجود.</Text></View>;
+  if (!customer) return <View style={s.screen}><Text style={[s.txt, { padding: 16 }]}>العميل غير موجود.</Text></View>;
+
+  const place = [customer.wilaya, customer.commune].filter(Boolean).join(' — ');
 
   return (
-    <ScrollView style={s.screen} contentContainerStyle={s.content}>
-      <Card style={{ alignItems: 'center', gap: 5, paddingVertical: 20 }}>
-        <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(237,41,41,0.15)', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: C.accent, fontWeight: '800', fontSize: 22 }}>{(cust.name || '؟').trim().charAt(0)}</Text>
+    <ScrollView style={s.screen} contentContainerStyle={[s.content, { paddingBottom: BOTTOM_PAD }]}>
+      <Card style={{ gap: 8 }}>
+        <Text style={[s.h2, { fontSize: 19 }]}>{customer.name || '—'}</Text>
+        <KV k="الهاتف" v={customer.phone} />
+        <KV k="هاتف ثانٍ" v={customer.phone2} />
+        <KV k="الولاية — البلدية" v={place || null} />
+        <KV k="العنوان" v={customer.address} />
+        <KV k="عميل منذ" v={customer.createdAt ? fmtDate(customer.createdAt) : null} />
+        <KV k="آخر طلب" v={customer.lastOrderAt ? fmtDate(customer.lastOrderAt) : null} />
+        <View style={[s.row, { marginTop: 6 }]}>
+          <Pressable style={{ flex: 1, backgroundColor: '#21301F', borderRadius: 14, paddingVertical: 11, alignItems: 'center' }} onPress={() => customer.phone && Linking.openURL(`tel:${customer.phone}`)}>
+            <Text style={{ color: '#59D98C', fontWeight: '700', fontSize: 14 }}>اتصال</Text>
+          </Pressable>
+          <Pressable style={{ flex: 1, backgroundColor: '#12291C', borderRadius: 14, paddingVertical: 11, alignItems: 'center' }} onPress={() => customer.phone && Linking.openURL(`https://wa.me/${waNumber(customer.phone)}`)}>
+            <Text style={{ color: '#59D98C', fontWeight: '700', fontSize: 14 }}>WhatsApp</Text>
+          </Pressable>
         </View>
-        <Text style={[s.h2, { fontSize: 19 }]}>{cust.name}</Text>
-        <Text style={s.sub}>{cust.phone || ''}{cust.wilaya ? ` · ${cust.wilaya}${cust.commune ? '، ' + cust.commune : ''}` : ''}</Text>
-        <Text style={s.sub}>{cust.totalOrders ?? orders.length} طلب · {dzd(cust.totalSpent)}</Text>
       </Card>
+
       <View style={s.row}>
-        <Pressable style={{ flex: 1 }} onPress={() => cust.phone && Linking.openURL(`tel:${cust.phone}`)}>
-          <View style={[s.card, { alignItems: 'center', paddingVertical: 12 }]}><Text style={[s.txt, { fontWeight: '700' }]}>اتصال</Text></View>
-        </Pressable>
-        <Pressable style={{ flex: 1 }} onPress={() => cust.phone && Linking.openURL(`https://wa.me/${waNumber(cust.phone)}`)}>
-          <View style={[s.card, { alignItems: 'center', paddingVertical: 12 }]}><Text style={[s.txt, { fontWeight: '700', color: '#59D98C' }]}>واتساب</Text></View>
-        </Pressable>
+        <Card style={{ flex: 1 }}>
+          <Text style={[s.h2, { fontSize: 22 }]}>{customer.totalOrders ?? orders.length}</Text>
+          <Text style={s.sub}>مجموع الطلبات</Text>
+        </Card>
+        <Card style={{ flex: 1 }}>
+          <Text style={[s.h2, { fontSize: 22 }]}>{dzd(customer.totalSpent)}</Text>
+          <Text style={s.sub}>مجموع ما أنفق</Text>
+        </Card>
       </View>
+
       <Text style={s.h2}>طلبات العميل</Text>
       {orders.map((o) => (
         <Pressable key={o.id} onPress={() => router.push(`/order/${o.id}` as any)}>
           <Card>
             <View style={s.row}>
               <View style={s.grow}>
-                <Text style={s.txt}>{o.orderNumber || 'طلب'}</Text>
-                <Text style={s.sub}>{fmtDate(o.createdAt)}</Text>
+                <Text style={[s.txt, { fontWeight: '700' }]}>{o.orderNumber || ''}</Text>
+                <Text style={s.sub}>{fmtDate(o.createdAt)}{o.productName ? ` · ${o.productName}` : ''}</Text>
               </View>
               <StatusPill status={o.status} />
-              <Text style={[s.txt, { fontWeight: '700' }]}>{dzd(o.codAmount ?? o.price)}</Text>
+              <Text style={[s.txt, { fontWeight: '700' }]}>{dzd(orderTotalOf(o))}</Text>
             </View>
           </Card>
         </Pressable>
       ))}
-      {orders.length === 0 ? <Text style={s.sub}>لا توجد طلبات.</Text> : null}
+      {orders.length === 0 ? <Text style={s.sub}>لا توجد طلبات لهذا العميل.</Text> : null}
     </ScrollView>
   );
 }
