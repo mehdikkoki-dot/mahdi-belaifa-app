@@ -2,7 +2,7 @@ import { NativeTabs } from 'expo-router/native-tabs';
 
 export default function TabsLayout() {
   return (
-    <NativeTabs backgroundColor="#F5F4F0" tintColor="#6E8A77">
+    <NativeTabs backgroundColor="#F5F3EE" tintColor="#6E8A77">
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>اليوم</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf="square.grid.2x2" />

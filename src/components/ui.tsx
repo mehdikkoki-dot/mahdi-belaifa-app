@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { SymbolView } from 'expo-symbols';
+import Svg, { Polygon, Polyline } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const C = {
-  canvas: '#F5F4F0',
+  canvas: '#F5F3EE',
   card: '#FFFFFF',
   hairline: 'rgba(41,45,50,0.10)',
-  label: '#292D32',
+  label: '#292D30',
   secondary: '#858982',
   tertiary: 'rgba(41,45,50,0.38)',
-  accent: '#829A89',
+  accent: '#829889',
 };
 
 export const s = StyleSheet.create({
@@ -37,20 +39,18 @@ export const BOTTOM_PAD = 118;
 export function Card({ children, style }: { children: React.ReactNode; style?: any }) {
   return (
     <View style={[{
-      borderRadius: 22, borderWidth: 1, borderColor: 'rgba(41,45,50,0.08)',
-      backgroundColor: 'rgba(255,255,255,0.66)', overflow: 'hidden',
-      shadowColor: '#292D32', shadowOpacity: 0.07, shadowRadius: 16, shadowOffset: { width: 0, height: 6 },
+      backgroundColor: '#FFFFFF', borderRadius: 22, padding: 16,
+      borderWidth: 0.5, borderColor: 'rgba(41,45,48,0.06)',
+      shadowColor: '#3A4038', shadowOpacity: 0.07, shadowRadius: 14, shadowOffset: { width: 0, height: 5 },
     }, style]}>
-      <BlurView intensity={55} tint="light" style={StyleSheet.absoluteFill} />
-      <LinearGradient colors={['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.10)', 'rgba(255,255,255,0)']} locations={[0, 0.45, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
-      <View style={{ padding: 16 }}>{children}</View>
+      {children}
     </View>
   );
 }
 
 export type GlassVariant = 'primary' | 'neutral' | 'green' | 'ghost';
 const GLASS_COLORS: Record<GlassVariant, { bg: string; border: string; text: string; glow?: string }> = {
-  primary: { bg: 'rgba(130,154,137,0.38)', border: 'rgba(110,134,118,0.55)', text: '#2E4B38', glow: '#829A89' },
+  primary: { bg: 'rgba(130,154,137,0.38)', border: 'rgba(110,134,118,0.55)', text: '#2E4B38', glow: '#829889' },
   neutral: { bg: 'rgba(255,255,255,0.55)', border: 'rgba(41,45,50,0.14)', text: '#292D32' },
   green: { bg: 'rgba(139,170,150,0.35)', border: 'rgba(120,155,135,0.55)', text: '#2E4B38', glow: '#8BAA96' },
   ghost: { bg: 'rgba(255,255,255,0.35)', border: 'rgba(41,45,50,0.10)', text: '#5A5E58' },
@@ -78,6 +78,34 @@ export function GlassButton({ title, onPress, variant = 'neutral', small, flex, 
       <LinearGradient colors={['rgba(255,255,255,0.50)', 'rgba(255,255,255,0.10)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
       <Text style={{ color: c.text, fontWeight: '700', fontSize: small ? 13 : 15, textAlign: 'center', paddingVertical: small ? 8 : 13, paddingHorizontal: small ? 14 : 20 }}>{title}</Text>
     </Pressable>
+  );
+}
+
+export const HERO_LIGHT = require('../../assets/images/hero-light.jpg');
+export const HERO_DARK = require('../../assets/images/hero-dark.jpg');
+
+/** Soft tinted icon in a rounded chip or circle (SF Symbols). */
+export function SoftIcon({ name, tint = 'rgba(130,152,137,0.15)', color = '#5F7A68', size = 38, radius = 12, glyph = 17, circle = false }: {
+  name: string; tint?: string; color?: string; size?: number; radius?: number; glyph?: number; circle?: boolean;
+}) {
+  return (
+    <View style={{ width: size, height: size, borderRadius: circle ? 999 : radius, backgroundColor: tint, alignItems: 'center', justifyContent: 'center' }}>
+      <SymbolView name={name as any} size={glyph} tintColor={color} />
+    </View>
+  );
+}
+
+/** Minimal sparkline for the hero finance card. */
+export function Sparkline({ data, width = 118, height = 38, color = '#FFFFFF' }: { data: number[]; width?: number; height?: number; color?: string }) {
+  if (data.length < 2) return null;
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data, 0);
+  const pts = data.map((v, i) => `${(i / (data.length - 1)) * width},${height - 3 - ((v - min) / (max - min || 1)) * (height - 9)}`).join(' ');
+  return (
+    <Svg width={width} height={height}>
+      <Polygon points={`0,${height} ${pts} ${width},${height}`} fill={color} opacity={0.16} />
+      <Polyline points={pts} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+    </Svg>
   );
 }
 
@@ -202,7 +230,7 @@ export function SearchBox({ value, onChange, placeholder }: { value: string; onC
       onChangeText={onChange}
       placeholder={placeholder}
       placeholderTextColor={C.tertiary}
-      style={{ backgroundColor: 'rgba(255,255,255,0.65)', borderColor: 'rgba(41,45,50,0.12)', borderWidth: 1, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 11, color: C.label, fontSize: 15, textAlign: 'right' }}
+      style={{ backgroundColor: '#FFFFFF', borderColor: 'rgba(41,45,48,0.06)', borderWidth: 0.5, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 12, color: C.label, fontSize: 15, textAlign: 'right', shadowColor: '#3A4038', shadowOpacity: 0.06, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } }}
     />
   );
 }

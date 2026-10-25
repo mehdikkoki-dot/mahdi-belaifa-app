@@ -70,7 +70,7 @@ export default function Profit() {
   if (loading) return <View style={[s.screen, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={C.accent} /></View>;
   return (
     <ScrollView style={s.screen} contentContainerStyle={[s.content, { paddingTop: top, paddingBottom: BOTTOM_PAD }]} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={C.accent} />}>
-      <GlassGlow />
+      
       <View style={[s.row, { justifyContent: 'space-between' }]}>
         <View>
           <Text style={s.h1}>الأرباح</Text>
@@ -95,7 +95,7 @@ export default function Profit() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: 84, gap: 6 }}>
           {last7.map((d) => (
             <View key={d.t} style={{ flex: 1, alignItems: 'center', gap: 4 }}>
-              <GrowBar height={(d.rev / maxRev) * 58} color={d.rev > 0 ? '#829A89' : 'rgba(41,45,50,0.10)'} />
+              <GrowBar height={(d.rev / maxRev) * 58} color={d.rev > 0 ? '#829889' : 'rgba(41,45,50,0.10)'} />
               <Text style={[s.sub, { fontSize: 10.5 }]}>{d.label}</Text>
             </View>
           ))}
@@ -106,7 +106,7 @@ export default function Profit() {
             <Text style={s.sub}>هدف الشهر: {money(monthRevenue)} من {money(goal)} ({goalPct}%)</Text>
             <Pressable onPress={editGoal}><Text style={[s.sub, { color: '#5E7A68', fontWeight: '700' }]}>تعديل</Text></Pressable>
           </View>
-          <Bar pct={goalPct} color="#829A89" />
+          <Bar pct={goalPct} color="#829889" />
         </View>
       </Card>
 

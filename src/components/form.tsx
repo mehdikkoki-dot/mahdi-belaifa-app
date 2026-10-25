@@ -79,7 +79,7 @@ export function ChipRow({ options, value, onChange }: {
         const active = value === o.value;
         return (
           <Pressable key={o.value} onPress={() => onChange(o.value)} style={{ backgroundColor: active ? C.label : 'rgba(255,255,255,0.55)', borderColor: active ? C.label : 'rgba(41,45,50,0.14)', borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 }}>
-            <Text style={{ color: active ? '#F5F4F0' : C.secondary, fontWeight: '600', fontSize: 13.5 }}>{o.label}</Text>
+            <Text style={{ color: active ? '#F5F3EE' : C.secondary, fontWeight: '600', fontSize: 13.5 }}>{o.label}</Text>
           </Pressable>
         );
       })}

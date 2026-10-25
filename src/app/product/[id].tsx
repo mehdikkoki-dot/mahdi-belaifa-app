@@ -36,7 +36,7 @@ export default function ProductDetail() {
         <KV k="المخزون الإجمالي" v={stock !== null ? String(stock) : 'غير متعقّب'} bold />
         <KV k="رمز SKU" v={product.sku} />
         <KV k="الوسوم" v={Array.isArray(product.tags) && product.tags.length ? product.tags.join('، ') : null} />
-        <Pressable onPress={() => router.push(`/product-edit/${product.id}` as any)} style={{ backgroundColor: 'rgba(130,154,137,0.85)', borderRadius: 999, paddingVertical: 11, alignItems: 'center', marginTop: 4, borderWidth: 1, borderColor: 'rgba(110,134,118,0.5)', shadowColor: '#829A89', shadowOpacity: 0.35, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }}>
+        <Pressable onPress={() => router.push(`/product-edit/${product.id}` as any)} style={{ backgroundColor: 'rgba(130,154,137,0.85)', borderRadius: 999, paddingVertical: 11, alignItems: 'center', marginTop: 4, borderWidth: 1, borderColor: 'rgba(110,134,118,0.5)', shadowColor: '#829889', shadowOpacity: 0.35, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }}>
           <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14.5 }}>تعديل المنتج</Text>
         </Pressable>
       </Card>

@@ -142,7 +142,7 @@ export default function OrderDetail() {
       <Card style={{ gap: 10 }}>
         <Text style={s.h2}>تغيير الحالة</Text>
         {next ? (
-          <Pressable disabled={busy} onPress={() => setStatus(next)} style={{ backgroundColor: 'rgba(130,154,137,0.85)', borderRadius: 999, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(110,134,118,0.5)', shadowColor: '#829A89', shadowOpacity: 0.35, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, opacity: busy ? 0.6 : 1 }}>
+          <Pressable disabled={busy} onPress={() => setStatus(next)} style={{ backgroundColor: 'rgba(130,154,137,0.85)', borderRadius: 999, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(110,134,118,0.5)', shadowColor: '#829889', shadowOpacity: 0.35, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, opacity: busy ? 0.6 : 1 }}>
             <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15 }}>التالي: {STATUS_LABEL[next]}</Text>
           </Pressable>
         ) : null}
@@ -168,7 +168,7 @@ export default function OrderDetail() {
 
       {celebrate ? (
         <View pointerEvents="none" style={{ position: 'absolute', top: '38%', alignSelf: 'center', alignItems: 'center', gap: 8 }}>
-          <Animated.View style={{ width: 86, height: 86, borderRadius: 999, backgroundColor: '#829A89', alignItems: 'center', justifyContent: 'center', transform: [{ scale: popAnim }], shadowColor: '#829A89', shadowOpacity: 0.4, shadowRadius: 18, shadowOffset: { width: 0, height: 8 } }}>
+          <Animated.View style={{ width: 86, height: 86, borderRadius: 999, backgroundColor: '#829889', alignItems: 'center', justifyContent: 'center', transform: [{ scale: popAnim }], shadowColor: '#829889', shadowOpacity: 0.4, shadowRadius: 18, shadowOffset: { width: 0, height: 8 } }}>
             <Text style={{ color: '#fff', fontSize: 40, fontWeight: '800' }}>✓</Text>
           </Animated.View>
           <Animated.Text style={{ color: '#2E4B38', fontWeight: '700', fontSize: 16, opacity: popAnim }}>تم التوصيل بنجاح</Animated.Text>

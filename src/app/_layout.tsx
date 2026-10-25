@@ -21,12 +21,12 @@ function LockGate({ children }: { children: React.ReactNode }) {
     } catch { setLocked(false); }
   }, []);
   React.useEffect(() => { check(); }, [check]);
-  if (locked === null) return <View style={{ flex: 1, backgroundColor: '#F5F4F0' }} />;
+  if (locked === null) return <View style={{ flex: 1, backgroundColor: '#F5F3EE' }} />;
   if (locked) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#F5F4F0', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 }}>
+      <View style={{ flex: 1, backgroundColor: '#F5F3EE', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 }}>
         <Text style={{ color: '#292D32', fontSize: 20, fontWeight: '700' }}>التطبيق مقفل</Text>
-        <Pressable onPress={check} style={{ backgroundColor: '#829A89', borderRadius: 999, paddingHorizontal: 22, paddingVertical: 12 }}>
+        <Pressable onPress={check} style={{ backgroundColor: '#829889', borderRadius: 999, paddingHorizontal: 22, paddingVertical: 12 }}>
           <Text style={{ color: '#fff', fontWeight: '700' }}>فتح بـ Face ID</Text>
         </Pressable>
       </View>
@@ -40,10 +40,10 @@ export default function RootLayout() {
     <LockGate>
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: '#F5F4F0' },
+        headerStyle: { backgroundColor: '#F5F3EE' },
         headerTintColor: '#292D32',
         headerTitleStyle: { fontWeight: '700' },
-        contentStyle: { backgroundColor: '#F5F4F0' },
+        contentStyle: { backgroundColor: '#F5F3EE' },
       }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="order/[id]" options={{ title: 'تفاصيل الطلب' }} />
