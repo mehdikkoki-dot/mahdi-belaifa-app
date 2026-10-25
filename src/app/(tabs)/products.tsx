@@ -2,7 +2,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
 import { api, dzd } from '../../lib/api';
-import { BOTTOM_PAD, C, Card, GlassGlow, s, SearchBox, useTopPad } from '../../components/ui';
+import { BOTTOM_PAD, C, Card, EmptyState, GlassGlow, s, SearchBox, useTopPad } from '../../components/ui';
 import { loadCache, saveCache } from '../../lib/cache';
 
 export default function Products() {
@@ -46,7 +46,7 @@ export default function Products() {
         columnWrapperStyle={{ gap: 12 }}
         contentContainerStyle={{ padding: 16, paddingTop: 2, gap: 12, paddingBottom: BOTTOM_PAD }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={C.accent} />}
-        ListEmptyComponent={<Text style={s.sub}>لا توجد منتجات مطابقة.</Text>}
+        ListEmptyComponent={products.length === 0 ? <EmptyState art="products" title="لا توجد منتجات بعد" sub="أضف أول منتج لبدء البيع." /> : <EmptyState art="search" title="لا نتائج مطابقة" sub="جرّب كلمة بحث أخرى." />}
         renderItem={({ item: p }) => {
           const stock = p.totalInventory ?? p.inventory ?? null;
           const out = stock !== null && Number(stock) <= 0;

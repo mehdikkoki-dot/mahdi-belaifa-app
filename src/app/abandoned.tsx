@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { api, dzd, fmtDate } from '../lib/api';
-import { BOTTOM_PAD, C, Card, s } from '../components/ui';
+import { BOTTOM_PAD, C, Card, s, EmptyState } from '../components/ui';
 
 export default function Abandoned() {
   const [stats, setStats] = useState<any>(null);
@@ -48,7 +48,7 @@ export default function Abandoned() {
           </View>
         </Card>
       ))}
-      {list.length === 0 ? <Text style={s.sub}>لا توجد طلبات مهجورة مسجلة.</Text> : null}
+      {list.length === 0 ? <EmptyState art="orders" title="لا توجد طلبات مهجورة" sub="الطلبات التي بدأها العملاء ولم يُكملوها ستظهر هنا." /> : null}
     </ScrollView>
   );
 }

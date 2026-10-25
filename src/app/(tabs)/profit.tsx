@@ -3,7 +3,7 @@ import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { ALL_STATUSES, api, dzd, orderTotalOf, STATUS_COLOR, STATUS_LABEL } from '../../lib/api';
-import { AnimNum, Bar, BOTTOM_PAD, C, Card, GlassGlow, s, StatusPill, useTopPad } from '../../components/ui';
+import { AnimNum, Bar, GrowBar, BOTTOM_PAD, C, Card, GlassGlow, s, StatusPill, useTopPad } from '../../components/ui';
 import { loadCache, saveCache } from '../../lib/cache';
 
 const GOAL_KEY = 'monthlyGoal';
@@ -95,7 +95,7 @@ export default function Profit() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: 84, gap: 6 }}>
           {last7.map((d) => (
             <View key={d.t} style={{ flex: 1, alignItems: 'center', gap: 4 }}>
-              <View style={{ width: '70%', height: Math.max(4, (d.rev / maxRev) * 58), borderRadius: 6, backgroundColor: d.rev > 0 ? '#829A89' : 'rgba(41,45,50,0.10)' }} />
+              <GrowBar height={(d.rev / maxRev) * 58} color={d.rev > 0 ? '#829A89' : 'rgba(41,45,50,0.10)'} />
               <Text style={[s.sub, { fontSize: 10.5 }]}>{d.label}</Text>
             </View>
           ))}

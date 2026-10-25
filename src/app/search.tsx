@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { api, dzd, orderTotalOf } from '../lib/api';
-import { BOTTOM_PAD, Card, s, SearchBox, StatusPill } from '../components/ui';
+import { BOTTOM_PAD, Card, EmptyState, s, SearchBox, StatusPill } from '../components/ui';
 
 export default function GlobalSearch() {
   const router = useRouter();
@@ -26,8 +26,8 @@ export default function GlobalSearch() {
   return (
     <ScrollView style={s.screen} contentContainerStyle={[s.content, { paddingBottom: BOTTOM_PAD }]} keyboardShouldPersistTaps="handled">
       <SearchBox value={q} onChange={setQ} placeholder="ابحث في الطلبات والعملاء والمنتجات..." />
-      {!needle ? <Text style={s.sub}>اكتب رقم طلب، اسم، هاتف، أو منتج.</Text> : null}
-      {needle && oRes.length + cRes.length + pRes.length === 0 ? <Text style={s.sub}>لا نتائج لـ «{q}».</Text> : null}
+      {!needle ? <EmptyState art="search" title="بحث شامل" sub="اكتب رقم طلب، اسم زبون، هاتف، أو اسم منتج." /> : null}
+      {needle && oRes.length + cRes.length + pRes.length === 0 ? <EmptyState art="search" title="لا نتائج" sub={`لا شيء يطابق «${q}» في الطلبات والعملاء والمنتجات.`} /> : null}
 
       {oRes.length > 0 ? <Text style={s.h2}>الطلبات ({oRes.length})</Text> : null}
       {oRes.slice(0, 10).map((o) => (

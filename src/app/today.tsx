@@ -2,7 +2,7 @@ import * as Linking from 'expo-linking';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { api, dzd, orderTotalOf, STATUS_LABEL, waNumber } from '../lib/api';
-import { BOTTOM_PAD, C, Card, GlassButton, s } from '../components/ui';
+import { BOTTOM_PAD, C, Card, EmptyState, GlassButton, s } from '../components/ui';
 
 const OUT = ['ready', 'assigned', 'dispatched', 'out_for_delivery'];
 
@@ -66,7 +66,7 @@ export default function Today() {
           ))}
         </View>
       ))}
-      {orders.length === 0 ? <Text style={s.sub}>لا توجد طلبات جاهزة للتوصيل الآن.</Text> : null}
+      {orders.length === 0 ? <EmptyState art="delivery" title="لا شيء للتوصيل الآن" sub="الطلبات الجاهزة للخروج ستظهر هنا مجمعة بالبلدية." /> : null}
     </ScrollView>
   );
 }

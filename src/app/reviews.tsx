@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { api, fmtDate } from '../lib/api';
-import { BOTTOM_PAD, C, Card, s } from '../components/ui';
+import { BOTTOM_PAD, C, Card, EmptyState, s } from '../components/ui';
 
 const stars = (n: number) => '★'.repeat(Math.max(0, Math.min(5, Math.round(n || 0)))) + '☆'.repeat(Math.max(0, 5 - Math.round(n || 0)));
 
@@ -23,7 +23,7 @@ export default function Reviews() {
         <Text style={s.h2}>تقييمات العملاء</Text>
         <Text style={s.sub}>المجموع: {data?.total ?? list.length}{data?.pendingCount ? ` · بانتظار الموافقة: ${data.pendingCount}` : ''}</Text>
       </Card>
-      {list.length === 0 ? <Text style={s.sub}>لا توجد تقييمات بعد.</Text> : list.map((r) => (
+      {list.length === 0 ? <EmptyState art="search" title="لا توجد تقييمات بعد" sub="تقييمات العملاء على منتجاتك ستظهر هنا." /> : list.map((r) => (
         <Card key={r.id} style={{ gap: 5 }}>
           <View style={[s.row, { justifyContent: 'space-between' }]}>
             <Text style={{ color: '#C7A46A', fontSize: 15 }}>{stars(r.rating)}</Text>

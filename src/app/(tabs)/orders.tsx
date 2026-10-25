@@ -3,7 +3,7 @@ import * as Linking from 'expo-linking';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, SectionList, Share, Text, View } from 'react-native';
 import { ALL_STATUSES, api, dzd, orderTotalOf, relTime, STATUS_LABEL, waNumber } from '../../lib/api';
-import { BOTTOM_PAD, C, Card, FadeIn, GlassButton, GlassGlow, s, SearchBox, StatusPill, useTopPad } from '../../components/ui';
+import { BOTTOM_PAD, C, Card, EmptyState, FadeIn, GlassButton, GlassGlow, s, SearchBox, Skeleton, StatusPill, useTopPad } from '../../components/ui';
 import { loadCache, saveCache } from '../../lib/cache';
 
 const dayKey = (iso?: string) => { const d = new Date(iso || ''); d.setHours(0, 0, 0, 0); return d.getTime(); };
@@ -57,7 +57,13 @@ export default function Orders() {
     Share.share({ message: rows.join('\n'), title: 'orders.csv' });
   };
 
-  if (loading) return <View style={[s.screen, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={C.accent} /></View>;
+  if (loading) return (
+    <View style={[s.screen, { paddingTop: top, paddingHorizontal: 16, gap: 12 }]}>
+      <Skeleton height={34} width="45%" radius={10} />
+      <Skeleton height={46} radius={16} />
+      {[0, 1, 2].map((i) => <Skeleton key={i} height={104} radius={22} />)}
+    </View>
+  );
   return (
     <View style={s.screen}>
       <GlassGlow />
@@ -89,7 +95,7 @@ export default function Orders() {
         keyExtractor={(o) => o.id}
         contentContainerStyle={{ padding: 16, paddingTop: 4, gap: 12, paddingBottom: BOTTOM_PAD }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={C.accent} />}
-        ListEmptyComponent={<Text style={s.sub}>لا توجد طلبات مطابقة.</Text>}
+        ListEmptyComponent={orders.length === 0 ? <EmptyState art="orders" title="لا توجد طلبات بعد" sub="ستظهر طلبات متجرك هنا فور وصولها." /> : <EmptyState art="search" title="لا نتائج مطابقة" sub="جرّب كلمة بحث أو مرشّحاً آخر." />}
         renderSectionHeader={({ section }) => <Text style={[s.h2, { fontSize: 15, marginTop: 6 }]}>{section.title}</Text>}
         renderItem={({ item: o, index }) => (
           <FadeIn index={index}>

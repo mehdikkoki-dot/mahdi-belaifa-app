@@ -1,7 +1,8 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Modal, Pressable, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
+import { notifyError, notifySuccess, tapMedium } from '../../lib/haptics';
 import { ALL_STATUSES, api, dzd, fmtDate, nextStatus, orderTotalOf, STATUS_COLOR, STATUS_LABEL, waNumber } from '../../lib/api';
 import { BOTTOM_PAD, C, Card, GlassButton, KV, s, StatusPill } from '../../components/ui';
 
@@ -12,6 +13,9 @@ export default function OrderDetail() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
+  const popAnim = React.useRef(new Animated.Value(0)).current;
 
   const load = useCallback(async () => {
     try { setOrder(await api.order(id)); }
@@ -35,8 +39,15 @@ export default function OrderDetail() {
       if (!ok) return;
     }
     setBusy(true);
-    try { await api.setStatus(order.id, st); setOrder({ ...order, status: st }); }
-    catch { Alert.alert('خطأ', 'تعذر تغيير حالة الطلب'); }
+    try {
+      await api.setStatus(order.id, st); setOrder({ ...order, status: st }); setSheetOpen(false);
+      if (st === 'delivered') {
+        notifySuccess(); setCelebrate(true);
+        Animated.spring(popAnim, { toValue: 1, friction: 5, tension: 90, useNativeDriver: true }).start();
+        setTimeout(() => { setCelebrate(false); popAnim.setValue(0); }, 1500);
+      } else tapMedium();
+    }
+    catch { notifyError(); Alert.alert('خطأ', 'تعذر تغيير حالة الطلب'); }
     setBusy(false);
   };
 
@@ -135,14 +146,34 @@ export default function OrderDetail() {
             <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15 }}>التالي: {STATUS_LABEL[next]}</Text>
           </Pressable>
         ) : null}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {ALL_STATUSES.filter((k) => k !== order.status).map((k) => (
-            <Pressable key={k} disabled={busy} onPress={() => setStatus(k)} style={{ borderColor: STATUS_COLOR[k] + '73', backgroundColor: STATUS_COLOR[k] + '1A', borderWidth: 0.8, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 }}>
-              <Text style={{ color: STATUS_COLOR[k], fontWeight: '600', fontSize: 13 }}>{STATUS_LABEL[k]}</Text>
-            </Pressable>
-          ))}
-        </View>
+        <GlassButton title="كل الحالات" variant="neutral" small onPress={() => setSheetOpen(true)} />
       </Card>
+
+      <Modal visible={sheetOpen} transparent animationType="slide" onRequestClose={() => setSheetOpen(false)}>
+        <Pressable style={{ flex: 1, backgroundColor: 'rgba(41,45,50,0.35)' }} onPress={() => setSheetOpen(false)}>
+          <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FBFAF7', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: 34, gap: 2 }}>
+            <Text style={[s.h2, { marginBottom: 8 }]}>تغيير حالة الطلب</Text>
+            {ALL_STATUSES.filter((k) => k !== order.status).map((k) => (
+              <Pressable key={k} disabled={busy} onPress={() => setStatus(k)}>
+                <View style={[s.row, { paddingVertical: 11, borderBottomWidth: 0.5, borderBottomColor: C.hairline }]}>
+                  <View style={{ width: 9, height: 9, borderRadius: 99, backgroundColor: STATUS_COLOR[k] }} />
+                  <Text style={[s.txt, { flex: 1, fontWeight: '500' }]}>{STATUS_LABEL[k]}</Text>
+                  <Text style={{ color: C.tertiary, fontSize: 17 }}>{'‹'}</Text>
+                </View>
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
+
+      {celebrate ? (
+        <View pointerEvents="none" style={{ position: 'absolute', top: '38%', alignSelf: 'center', alignItems: 'center', gap: 8 }}>
+          <Animated.View style={{ width: 86, height: 86, borderRadius: 999, backgroundColor: '#829A89', alignItems: 'center', justifyContent: 'center', transform: [{ scale: popAnim }], shadowColor: '#829A89', shadowOpacity: 0.4, shadowRadius: 18, shadowOffset: { width: 0, height: 8 } }}>
+            <Text style={{ color: '#fff', fontSize: 40, fontWeight: '800' }}>✓</Text>
+          </Animated.View>
+          <Animated.Text style={{ color: '#2E4B38', fontWeight: '700', fontSize: 16, opacity: popAnim }}>تم التوصيل بنجاح</Animated.Text>
+        </View>
+      ) : null}
 
       <Pressable onPress={() => router.back()}>
         <Text style={[s.sub, { textAlign: 'center' }]}>رجوع</Text>

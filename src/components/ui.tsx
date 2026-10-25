@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -61,9 +61,10 @@ export function GlassButton({ title, onPress, variant = 'neutral', small, flex, 
   title: string; onPress?: () => void; variant?: GlassVariant; small?: boolean; flex?: boolean; disabled?: boolean;
 }) {
   const c = GLASS_COLORS[variant];
+  const { tapLight } = require('../lib/haptics');
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => { tapLight(); onPress?.(); }}
       disabled={disabled}
       style={({ pressed }) => ({
         flex: flex ? 1 : undefined,
@@ -77,6 +78,49 @@ export function GlassButton({ title, onPress, variant = 'neutral', small, flex, 
       <LinearGradient colors={['rgba(255,255,255,0.50)', 'rgba(255,255,255,0.10)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
       <Text style={{ color: c.text, fontWeight: '700', fontSize: small ? 13 : 15, textAlign: 'center', paddingVertical: small ? 8 : 13, paddingHorizontal: small ? 14 : 20 }}>{title}</Text>
     </Pressable>
+  );
+}
+
+/** Animated bar that grows to its height when it appears. */
+export function GrowBar({ height, color, radius = 6 }: { height: number; color: string; radius?: number }) {
+  const anim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(anim, { toValue: Math.max(4, height), duration: 750, useNativeDriver: false }).start();
+  }, [height, anim]);
+  return <Animated.View style={{ width: '70%', alignSelf: 'center', height: anim, borderRadius: radius, backgroundColor: color }} />;
+}
+
+/** Pulsing skeleton block for loading states. */
+export function Skeleton({ height = 16, width = '100%', radius = 8, style }: { height?: number; width?: any; radius?: number; style?: any }) {
+  const anim = useRef(new Animated.Value(0.45)).current;
+  useEffect(() => {
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(anim, { toValue: 1, duration: 700, useNativeDriver: false }),
+      Animated.timing(anim, { toValue: 0.45, duration: 700, useNativeDriver: false }),
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, [anim]);
+  return <Animated.View style={[{ height, width, borderRadius: radius, backgroundColor: '#E3E1D8', opacity: anim }, style]} />;
+}
+
+export const EMPTY_ART = {
+  orders: require('../../assets/images/empty-orders.jpg'),
+  products: require('../../assets/images/empty-products.jpg'),
+  delivery: require('../../assets/images/empty-delivery.jpg'),
+  search: require('../../assets/images/empty-search.jpg'),
+};
+
+/** Illustrated empty state with a gentle entrance. */
+export function EmptyState({ art, title, sub }: { art: keyof typeof EMPTY_ART; title: string; sub?: string }) {
+  return (
+    <FadeIn index={1}>
+      <View style={{ alignItems: 'center', gap: 10, paddingVertical: 26, paddingHorizontal: 12 }}>
+        <Image source={EMPTY_ART[art]} style={{ width: 210, height: 158, borderRadius: 20 }} resizeMode="cover" />
+        <Text style={[s.h2, { fontSize: 16, textAlign: 'center' }]}>{title}</Text>
+        {sub ? <Text style={[s.sub, { textAlign: 'center' }]}>{sub}</Text> : null}
+      </View>
+    </FadeIn>
   );
 }
 

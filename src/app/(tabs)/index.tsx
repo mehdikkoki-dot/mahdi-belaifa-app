@@ -3,7 +3,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { ALL_STATUSES, api, dzd, orderTotalOf, relTime, STATUS_COLOR } from '../../lib/api';
-import { AnimNum, Bar, BOTTOM_PAD, C, Card, GlassGlow, s, StatusPill, useTopPad } from '../../components/ui';
+import { AnimNum, Bar, GrowBar, BOTTOM_PAD, C, Card, FadeIn, GlassGlow, s, Skeleton, StatusPill, useTopPad } from '../../components/ui';
 import { loadCache, saveCache } from '../../lib/cache';
 
 const GOAL_KEY = 'monthlyGoal';
@@ -86,7 +86,14 @@ export default function Dashboard() {
     </Pressable>
   );
 
-  if (loading) return <View style={[s.screen, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={C.accent} /></View>;
+  if (loading) return (
+    <View style={[s.screen, { paddingTop: top, paddingHorizontal: 16, gap: 12 }]}>
+      <Skeleton height={54} radius={16} />
+      <Skeleton height={150} radius={22} />
+      <Skeleton height={120} radius={22} />
+      <Skeleton height={110} radius={22} />
+    </View>
+  );
   return (
     <ScrollView style={s.screen} contentContainerStyle={[s.content, { paddingTop: top, paddingBottom: BOTTOM_PAD }]} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={C.accent} />}>
       <GlassGlow />
@@ -177,7 +184,7 @@ export default function Dashboard() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: 72, gap: 6 }}>
           {last7.map((d) => (
             <View key={d.t} style={{ flex: 1, alignItems: 'center', gap: 4 }}>
-              <View style={{ width: '70%', height: Math.max(4, (d.n / maxDay) * 48), borderRadius: 6, backgroundColor: d.n > 0 ? '#829A89' : 'rgba(41,45,50,0.10)' }} />
+              <GrowBar height={(d.n / maxDay) * 48} color={d.n > 0 ? '#829A89' : 'rgba(41,45,50,0.10)'} />
               <Text style={[s.sub, { fontSize: 10.5 }]}>{d.label}</Text>
             </View>
           ))}
