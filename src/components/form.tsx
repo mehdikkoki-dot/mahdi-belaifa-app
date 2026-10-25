@@ -1,8 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { C, s, SearchBox } from './ui';
-import { LinearGradient } from 'expo-linear-gradient';
+import { C, GlassButton, s, SearchBox } from './ui';
 
 export function Field({ label, value, onChange, placeholder, keyboard, multiline }: {
   label: string; value: string; onChange: (v: string) => void; placeholder?: string;
@@ -90,7 +89,7 @@ export function ChipRow({ options, value, onChange }: {
 
 export function QtyStepper({ qty, setQty }: { qty: number; setQty: (n: number) => void }) {
   const Btn = ({ t, fn }: { t: string; fn: () => void }) => (
-    <Pressable onPress={fn} style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: '#2C2C2E', alignItems: 'center', justifyContent: 'center' }}>
+    <Pressable onPress={fn} style={{ width: 40, height: 40, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.10)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center' }}>
       <Text style={{ color: C.label, fontSize: 19, fontWeight: '700' }}>{t}</Text>
     </Pressable>
   );
@@ -104,11 +103,5 @@ export function QtyStepper({ qty, setQty }: { qty: number; setQty: (n: number) =
 }
 
 export function SaveButton({ title, busy, onPress, disabled }: { title: string; busy?: boolean; onPress: () => void; disabled?: boolean }) {
-  return (
-    <Pressable disabled={busy || disabled} onPress={onPress} style={{ borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', opacity: busy || disabled ? 0.55 : 1, shadowColor: '#ED2929', shadowOpacity: 0.4, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }}>
-      <LinearGradient colors={['#FF5147', '#ED2929', '#C81E1E']} locations={[0, 0.55, 1]} style={{ paddingVertical: 14, alignItems: 'center' }}>
-        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>{busy ? 'جارٍ الحفظ...' : title}</Text>
-      </LinearGradient>
-    </Pressable>
-  );
+  return <GlassButton title={busy ? 'جارٍ الحفظ...' : title} onPress={onPress} variant="primary" disabled={busy || disabled} />;
 }

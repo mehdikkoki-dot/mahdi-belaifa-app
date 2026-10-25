@@ -39,6 +39,8 @@ export default function More() {
       <Row title="مجموعات ووسوم العملاء" sub="تنظيم العملاء في مجموعات ووسوم" onPress={() => router.push('/groups' as any)} />
       <Row title="التقييمات" sub="آراء العملاء في المنتجات" onPress={() => router.push('/reviews' as any)} />
       <Row title="الإعدادات" sub="المتجر، البكسل، وقفل Face ID" onPress={() => router.push('/settings' as any)} />
+      <Row title="توصيل اليوم" sub="طلبات جاهزة للخروج، مجمعة بالبلدية" onPress={() => router.push('/today' as any)} />
+      <Row title="بحث شامل" sub="بحث واحد في الطلبات والعملاء والمنتجات" onPress={() => router.push('/search' as any)} />
       <Row title="فتح لوحة الويب" sub="نفس اللوحة في المتصفح" onPress={() => Linking.openURL(DASHBOARD_URL)} />
       <Row title="صفحة الهبوط" sub="صفحة بيع الحزام" onPress={() => Linking.openURL('https://mahdi-belaifa-landing.basatbelaifa7.workers.dev')} />
       <Card>

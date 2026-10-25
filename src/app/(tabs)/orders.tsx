@@ -1,9 +1,18 @@
 import { useFocusEffect, useRouter } from 'expo-router';
+import * as Linking from 'expo-linking';
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
-import { ALL_STATUSES, api, dzd, orderTotalOf, relTime, STATUS_LABEL } from '../../lib/api';
-import { BOTTOM_PAD, C, Card, FadeIn, s, SearchBox, StatusPill, useTopPad, GlassGlow } from '../../components/ui';
+import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, SectionList, Share, Text, View } from 'react-native';
+import { ALL_STATUSES, api, dzd, orderTotalOf, relTime, STATUS_LABEL, waNumber } from '../../lib/api';
+import { BOTTOM_PAD, C, Card, FadeIn, GlassButton, GlassGlow, s, SearchBox, StatusPill, useTopPad } from '../../components/ui';
 import { loadCache, saveCache } from '../../lib/cache';
+
+const dayKey = (iso?: string) => { const d = new Date(iso || ''); d.setHours(0, 0, 0, 0); return d.getTime(); };
+const dayTitle = (t: number) => {
+  const today = dayKey(new Date().toISOString());
+  if (t === today) return 'اليوم';
+  if (t === today - 86400000) return 'أمس';
+  return new Date(t).toLocaleDateString('ar-DZ', { weekday: 'long', day: 'numeric', month: 'long' });
+};
 
 export default function Orders() {
   const router = useRouter();
@@ -27,7 +36,22 @@ export default function Orders() {
     if (needle) list = list.filter((o) => [o.orderNumber, o.customerName, o.phone, o.productName].some((v) => String(v || '').toLowerCase().includes(needle)));
     return list;
   }, [orders, filter, q]);
+  const sections = useMemo(() => {
+    const map = new Map<number, any[]>();
+    shown.forEach((o) => { const k = dayKey(o.createdAt); if (!map.has(k)) map.set(k, []); map.get(k)!.push(o); });
+    return [...map.entries()].sort((a, b) => b[0] - a[0]).map(([t, data]) => ({ title: dayTitle(t), data }));
+  }, [shown]);
   const present = useMemo(() => ALL_STATUSES.filter((k) => orders.some((o) => o.status === k)), [orders]);
+
+  const confirm = async (o: any) => {
+    try { await api.setStatus(o.id, 'confirmed'); setOrders(orders.map((x) => (x.id === o.id ? { ...x, status: 'confirmed' } : x))); }
+    catch { Alert.alert('خطأ', 'تعذر تأكيد الطلب'); }
+  };
+  const exportCsv = () => {
+    const rows = [['رقم الطلب', 'التاريخ', 'الزبون', 'الهاتف', 'الولاية', 'الحالة', 'المبلغ'].join(','),
+      ...shown.map((o) => [o.orderNumber || '', new Date(o.createdAt).toLocaleDateString('fr-DZ'), (o.customerName || '').replace(/,/g, ' '), o.phone || '', (o.wilaya || '').replace(/,/g, ' '), STATUS_LABEL[o.status] || o.status || '', orderTotalOf(o)].join(','))];
+    Share.share({ message: rows.join('\n'), title: 'orders.csv' });
+  };
 
   if (loading) return <View style={[s.screen, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={C.accent} /></View>;
   return (
@@ -36,47 +60,56 @@ export default function Orders() {
       <View style={{ paddingTop: top, paddingHorizontal: 16, gap: 10 }}>
         <View style={[s.row, { justifyContent: 'space-between' }]}>
           <Text style={s.h1}>الطلبات</Text>
-          <Pressable onPress={() => router.push('/order-new' as any)} style={{ backgroundColor: 'rgba(237,41,41,0.88)', width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', shadowColor: '#ED2929', shadowOpacity: 0.45, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } }}>
-          <Text style={{ color: '#fff', fontSize: 22, fontWeight: '700', lineHeight: 24 }}>+</Text>
-        </Pressable>
+          <View style={[s.row, { gap: 8 }]}>
+            <GlassButton title="تصدير" small variant="ghost" onPress={exportCsv} />
+            <Pressable onPress={() => router.push('/order-new' as any)} style={{ backgroundColor: 'rgba(237,41,41,0.34)', width: 40, height: 40, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,140,130,0.55)' }}>
+              <Text style={{ color: '#fff', fontSize: 22, fontWeight: '700', lineHeight: 24 }}>+</Text>
+            </Pressable>
+          </View>
         </View>
         <SearchBox value={q} onChange={setQ} placeholder="ابحث برقم الطلب، الاسم، الهاتف..." />
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingVertical: 10 }}>
         {['all', ...present].map((k) => {
-          const active = filter === k;
+          const isActive = filter === k;
           const n = k === 'all' ? orders.length : orders.filter((o) => o.status === k).length;
           return (
-            <Pressable key={k} onPress={() => setFilter(k)} style={{ backgroundColor: active ? C.label : 'rgba(255,255,255,0.08)', borderColor: active ? C.label : 'rgba(255,255,255,0.14)', borderWidth: 0.8, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 }}>
-              <Text style={{ color: active ? '#000' : C.secondary, fontWeight: '600', fontSize: 13 }}>{k === 'all' ? `الكل (${n})` : `${STATUS_LABEL[k]} (${n})`}</Text>
+            <Pressable key={k} onPress={() => setFilter(k)} style={{ backgroundColor: isActive ? C.label : 'rgba(255,255,255,0.08)', borderColor: isActive ? C.label : 'rgba(255,255,255,0.20)', borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 }}>
+              <Text style={{ color: isActive ? '#000' : C.secondary, fontWeight: '600', fontSize: 13 }}>{k === 'all' ? `الكل (${n})` : `${STATUS_LABEL[k]} (${n})`}</Text>
             </Pressable>
           );
         })}
       </ScrollView>
-      <FlatList
-        data={shown}
+      <SectionList
+        sections={sections}
         keyExtractor={(o) => o.id}
         contentContainerStyle={{ padding: 16, paddingTop: 4, gap: 12, paddingBottom: BOTTOM_PAD }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={C.accent} />}
         ListEmptyComponent={<Text style={s.sub}>لا توجد طلبات مطابقة.</Text>}
+        renderSectionHeader={({ section }) => <Text style={[s.h2, { fontSize: 15, marginTop: 6 }]}>{section.title}</Text>}
         renderItem={({ item: o, index }) => (
           <FadeIn index={index}>
-          <Pressable onPress={() => router.push(`/order/${o.id}` as any)}>
             <Card>
-              <View style={s.row}>
-                <View style={s.grow}>
-                  <Text style={[s.txt, { fontWeight: '700' }]}>{o.orderNumber || ''}</Text>
-                  <Text style={s.sub}>{o.customerName || '—'}{o.phone ? ` · ${o.phone}` : ''}</Text>
-                  {o.productName ? <Text style={s.sub}>{o.productName} × {o.quantity ?? 1}</Text> : null}
+              <Pressable onPress={() => router.push(`/order/${o.id}` as any)}>
+                <View style={s.row}>
+                  <View style={s.grow}>
+                    <Text style={[s.txt, { fontWeight: '700' }]}>{o.orderNumber || ''}</Text>
+                    <Text style={s.sub}>{o.customerName || '—'}{o.phone ? ` · ${o.phone}` : ''}</Text>
+                    {o.productName ? <Text style={s.sub}>{o.productName} × {o.quantity ?? 1}</Text> : null}
+                  </View>
+                  <StatusPill status={o.status} />
                 </View>
-                <StatusPill status={o.status} />
-              </View>
-              <View style={[s.row, { justifyContent: 'space-between', marginTop: 8 }]}>
-                <Text style={[s.txt, { fontWeight: '700' }]}>{dzd(orderTotalOf(o))}</Text>
-                <Text style={s.sub}>{relTime(o.createdAt)}</Text>
+                <View style={[s.row, { justifyContent: 'space-between', marginTop: 8 }]}>
+                  <Text style={[s.txt, { fontWeight: '700' }]}>{dzd(orderTotalOf(o))}</Text>
+                  <Text style={s.sub}>{relTime(o.createdAt)}</Text>
+                </View>
+              </Pressable>
+              <View style={[s.row, { marginTop: 10, gap: 8 }]}>
+                <GlassButton title="اتصال" small variant="green" flex onPress={() => o.phone && Linking.openURL(`tel:${o.phone}`)} />
+                <GlassButton title="واتساب" small variant="green" flex onPress={() => o.phone && Linking.openURL(`https://wa.me/${waNumber(o.phone)}`)} />
+                {o.status === 'new' ? <GlassButton title="تأكيد" small variant="primary" flex onPress={() => confirm(o)} /> : null}
               </View>
             </Card>
-          </Pressable>
           </FadeIn>
         )}
       />

@@ -60,6 +60,8 @@ export default function RootLayout() {
       <Stack.Screen name="groups" options={{ title: 'المجموعات والوسوم' }} />
       <Stack.Screen name="reviews" options={{ title: 'التقييمات' }} />
       <Stack.Screen name="settings" options={{ title: 'الإعدادات' }} />
+      <Stack.Screen name="today" options={{ title: 'توصيل اليوم' }} />
+      <Stack.Screen name="search" options={{ title: 'بحث شامل' }} />
     </Stack>
     </LockGate>
   );

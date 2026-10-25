@@ -3,7 +3,7 @@ import * as Linking from 'expo-linking';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { ALL_STATUSES, api, dzd, fmtDate, nextStatus, orderTotalOf, STATUS_COLOR, STATUS_LABEL, waNumber } from '../../lib/api';
-import { BOTTOM_PAD, C, Card, KV, s, StatusPill } from '../../components/ui';
+import { BOTTOM_PAD, C, Card, GlassButton, KV, s, StatusPill } from '../../components/ui';
 
 export default function OrderDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -34,6 +34,11 @@ export default function OrderDetail() {
   if (!order) return <View style={s.screen}><Text style={[s.txt, { padding: 16 }]}>الطلب غير موجود.</Text></View>;
 
   const items: any[] = order.products || order.items || [];
+  const sendStatusWa = () => {
+    if (!order.phone) return;
+    const msg = `مرحباً ${order.customerName || ''}، طلبك ${order.orderNumber || ''} عند SOUR حالته الآن: ${STATUS_LABEL[order.status] || order.status || ''}. المبلغ عند الاستلام: ${dzd(orderTotalOf(order))}. شكراً لثقتك.`;
+    Linking.openURL(`https://wa.me/${waNumber(order.phone)}?text=${encodeURIComponent(msg)}`);
+  };
   const shareSummary = () => {
     const lines = [
       `طلب ${order.orderNumber || ''} — SOUR`,
@@ -107,9 +112,10 @@ export default function OrderDetail() {
         <KV k="المجموع الفرعي" v={dzd(order.price)} />
         <KV k="رسوم التوصيل" v={dzd(order.deliveryFee)} />
         <KV k="الإجمالي عند الاستلام" v={dzd(orderTotalOf(order))} bold />
-        <Pressable onPress={shareSummary} style={{ backgroundColor: '#12291C', borderRadius: 14, paddingVertical: 11, alignItems: 'center', marginTop: 4 }}>
-          <Text style={{ color: '#59D98C', fontWeight: '700', fontSize: 14.5 }}>مشاركة ملخص الطلب</Text>
-        </Pressable>
+        <View style={{ gap: 8, marginTop: 4 }}>
+          <GlassButton title="مشاركة ملخص الطلب" variant="green" small onPress={shareSummary} />
+          <GlassButton title="إرسال حالة الطلب للعميل (واتساب)" variant="green" small onPress={sendStatusWa} />
+        </View>
       </Card>
 
       <Card style={{ gap: 10 }}>

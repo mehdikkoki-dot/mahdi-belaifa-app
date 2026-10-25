@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -45,6 +45,38 @@ export function Card({ children, style }: { children: React.ReactNode; style?: a
       <LinearGradient colors={['rgba(255,255,255,0.11)', 'rgba(255,255,255,0.02)', 'rgba(255,255,255,0)']} locations={[0, 0.45, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
       <View style={{ padding: 16 }}>{children}</View>
     </View>
+  );
+}
+
+export type GlassVariant = 'primary' | 'neutral' | 'green' | 'ghost';
+const GLASS_COLORS: Record<GlassVariant, { bg: string; border: string; text: string; glow?: string }> = {
+  primary: { bg: 'rgba(237,41,41,0.34)', border: 'rgba(255,140,130,0.55)', text: '#FFFFFF', glow: '#ED2929' },
+  neutral: { bg: 'rgba(255,255,255,0.10)', border: 'rgba(255,255,255,0.28)', text: '#F5F5F7' },
+  green: { bg: 'rgba(46,160,90,0.30)', border: 'rgba(110,231,160,0.50)', text: '#C9F5DA', glow: '#2EA05A' },
+  ghost: { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.16)', text: 'rgba(255,255,255,0.75)' },
+};
+
+/** iOS 26-style Liquid Glass pill button: frosted blur, bright rim, specular top light. */
+export function GlassButton({ title, onPress, variant = 'neutral', small, flex, disabled }: {
+  title: string; onPress?: () => void; variant?: GlassVariant; small?: boolean; flex?: boolean; disabled?: boolean;
+}) {
+  const c = GLASS_COLORS[variant];
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      style={({ pressed }) => ({
+        flex: flex ? 1 : undefined,
+        borderRadius: 999, overflow: 'hidden',
+        borderWidth: 1, borderColor: c.border, backgroundColor: c.bg,
+        opacity: disabled ? 0.5 : 1,
+        transform: [{ scale: pressed && !disabled ? 0.965 : 1 }],
+        shadowColor: c.glow || '#000', shadowOpacity: c.glow ? 0.45 : 0.25, shadowRadius: c.glow ? 14 : 8, shadowOffset: { width: 0, height: 5 },
+      })}>
+      <BlurView intensity={45} tint="dark" style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['rgba(255,255,255,0.22)', 'rgba(255,255,255,0.04)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
+      <Text style={{ color: c.text, fontWeight: '700', fontSize: small ? 13 : 15, textAlign: 'center', paddingVertical: small ? 8 : 13, paddingHorizontal: small ? 14 : 20 }}>{title}</Text>
+    </Pressable>
   );
 }
 
