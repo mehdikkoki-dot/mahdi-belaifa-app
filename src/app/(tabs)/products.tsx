@@ -28,7 +28,12 @@ export default function Products() {
   return (
     <View style={s.screen}>
       <View style={{ paddingTop: top, paddingHorizontal: 16, gap: 10 }}>
-        <Text style={s.h1}>المنتجات</Text>
+        <View style={[s.row, { justifyContent: 'space-between' }]}>
+          <Text style={s.h1}>المنتجات</Text>
+          <Pressable onPress={() => router.push('/product-new' as any)} style={{ backgroundColor: C.accent, width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: '#fff', fontSize: 22, fontWeight: '700', lineHeight: 24 }}>+</Text>
+        </Pressable>
+        </View>
         <SearchBox value={q} onChange={setQ} placeholder="ابحث عن منتج..." />
       </View>
       <FlatList

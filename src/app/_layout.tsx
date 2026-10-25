@@ -21,6 +21,10 @@ export default function RootLayout() {
       <Stack.Screen name="abandoned" options={{ title: 'الطلبات المهجورة' }} />
       <Stack.Screen name="stock" options={{ title: 'المخزون' }} />
       <Stack.Screen name="delivery" options={{ title: 'الشحن والتوصيل' }} />
+      <Stack.Screen name="order-new" options={{ title: 'طلب جديد' }} />
+      <Stack.Screen name="customer-new" options={{ title: 'العميل' }} />
+      <Stack.Screen name="product-new" options={{ title: 'منتج جديد' }} />
+      <Stack.Screen name="product-edit/[id]" options={{ title: 'تعديل المنتج' }} />
     </Stack>
   );
 }

@@ -20,6 +20,16 @@ export const api = {
   customers: (): Promise<any[]> => req('/api/customers?limit=100&offset=0'),
   customerOrders: (id: string): Promise<any[]> => req(`/api/customers/${id}/orders`),
   store: () => req('/api/stores/me'),
+  wilayas: (): Promise<any[]> => req('/api/wilayas'),
+  communes: (w: number): Promise<any[]> => req(`/api/wilayas/${w}/communes`),
+  shippingRules: (): Promise<any[]> => req('/api/shipping-profiles/default/rules'),
+  createOrder: (body: any) => req('/api/orders', 'POST', body),
+  createCustomer: (body: any) => req('/api/customers', 'POST', body),
+  updateCustomer: (id: string, body: any) => req(`/api/customers/${id}`, 'PATCH', body),
+  createProduct: (body: any) => req('/api/products', 'POST', body),
+  updateProduct: (id: string, body: any) => req(`/api/products/${id}`, 'PATCH', body),
+  updateProductStatus: (id: string, status: string) => req(`/api/products/${id}/status`, 'PATCH', { status }),
+  updateVariant: (pid: string, vid: string, body: any) => req(`/api/products/${pid}/variants/${vid}`, 'PATCH', body),
   stock: () => req('/api/stock/overview'),
   offers: (): Promise<any[]> => req('/api/offers?limit=100&offset=0'),
   abandonedStats: () => req('/api/abandoned-orders/stats'),
@@ -94,4 +104,12 @@ export function variantLabel(v: any): string {
     return Object.values(vars).map((x: any) => (x && typeof x === 'object' ? x.value ?? '' : String(x ?? ''))).filter(Boolean).join(' · ');
   }
   return v.name || v.sku || '';
+}
+
+export function uuidv4(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }

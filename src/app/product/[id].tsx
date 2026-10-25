@@ -1,11 +1,12 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { api, dzd, variantLabel } from '../../lib/api';
 import { BOTTOM_PAD, C, Card, KV, s } from '../../components/ui';
 
 export default function ProductDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = require('expo-router').useRouter();
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -35,6 +36,9 @@ export default function ProductDetail() {
         <KV k="المخزون الإجمالي" v={stock !== null ? String(stock) : 'غير متعقّب'} bold />
         <KV k="رمز SKU" v={product.sku} />
         <KV k="الوسوم" v={Array.isArray(product.tags) && product.tags.length ? product.tags.join('، ') : null} />
+        <Pressable onPress={() => router.push(`/product-edit/${product.id}` as any)} style={{ backgroundColor: C.accent, borderRadius: 14, paddingVertical: 11, alignItems: 'center', marginTop: 4 }}>
+          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14.5 }}>تعديل المنتج</Text>
+        </Pressable>
       </Card>
       {product.descriptionPlain || product.description ? (
         <Card>

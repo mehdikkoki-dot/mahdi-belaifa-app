@@ -31,7 +31,12 @@ export default function Orders() {
   return (
     <View style={s.screen}>
       <View style={{ paddingTop: top, paddingHorizontal: 16, gap: 10 }}>
-        <Text style={s.h1}>الطلبات</Text>
+        <View style={[s.row, { justifyContent: 'space-between' }]}>
+          <Text style={s.h1}>الطلبات</Text>
+          <Pressable onPress={() => router.push('/order-new' as any)} style={{ backgroundColor: C.accent, width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: '#fff', fontSize: 22, fontWeight: '700', lineHeight: 24 }}>+</Text>
+        </Pressable>
+        </View>
         <SearchBox value={q} onChange={setQ} placeholder="ابحث برقم الطلب، الاسم، الهاتف..." />
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={{ paddingHorizontal: 16, gap: 8, paddingVertical: 10 }}>
