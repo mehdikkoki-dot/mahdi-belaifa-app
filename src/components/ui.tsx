@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const C = {
@@ -33,7 +35,29 @@ export function useTopPad(extra = 10): number {
 export const BOTTOM_PAD = 118;
 
 export function Card({ children, style }: { children: React.ReactNode; style?: any }) {
-  return <View style={[s.card, style]}>{children}</View>;
+  return (
+    <View style={[{
+      borderRadius: 26, borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)',
+      backgroundColor: 'rgba(30,30,32,0.52)', overflow: 'hidden',
+      shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 14, shadowOffset: { width: 0, height: 6 },
+    }, style]}>
+      <BlurView intensity={55} tint="dark" style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['rgba(255,255,255,0.11)', 'rgba(255,255,255,0.02)', 'rgba(255,255,255,0)']} locations={[0, 0.45, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
+      <View style={{ padding: 16 }}>{children}</View>
+    </View>
+  );
+}
+
+/** Soft brand glow behind tab screens so the glass has something to refract. */
+export function GlassGlow() {
+  return (
+    <LinearGradient
+      colors={['rgba(237,41,41,0.22)', 'rgba(237,41,41,0.06)', 'rgba(0,0,0,0)']}
+      locations={[0, 0.55, 1]}
+      style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 360 }}
+      pointerEvents="none"
+    />
+  );
 }
 
 export function StatusPill({ status }: { status?: string }) {
@@ -102,7 +126,7 @@ export function SearchBox({ value, onChange, placeholder }: { value: string; onC
       onChangeText={onChange}
       placeholder={placeholder}
       placeholderTextColor={C.tertiary}
-      style={{ backgroundColor: C.card, borderColor: C.hairline, borderWidth: 0.5, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 11, color: C.label, fontSize: 15, textAlign: 'right' }}
+      style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.18)', borderWidth: 1, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 11, color: C.label, fontSize: 15, textAlign: 'right' }}
     />
   );
 }

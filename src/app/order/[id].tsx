@@ -115,7 +115,7 @@ export default function OrderDetail() {
       <Card style={{ gap: 10 }}>
         <Text style={s.h2}>تغيير الحالة</Text>
         {next ? (
-          <Pressable disabled={busy} onPress={() => setStatus(next)} style={{ backgroundColor: C.accent, borderRadius: 14, paddingVertical: 12, alignItems: 'center', opacity: busy ? 0.6 : 1 }}>
+          <Pressable disabled={busy} onPress={() => setStatus(next)} style={{ backgroundColor: 'rgba(237,41,41,0.92)', borderRadius: 16, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', shadowColor: '#ED2929', shadowOpacity: 0.4, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, opacity: busy ? 0.6 : 1 }}>
             <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>التالي: {STATUS_LABEL[next]}</Text>
           </Pressable>
         ) : null}

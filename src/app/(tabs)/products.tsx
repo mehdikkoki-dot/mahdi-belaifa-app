@@ -2,7 +2,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
 import { api, dzd } from '../../lib/api';
-import { BOTTOM_PAD, C, Card, s, SearchBox, useTopPad } from '../../components/ui';
+import { BOTTOM_PAD, C, Card, s, SearchBox, useTopPad, GlassGlow } from '../../components/ui';
 import { loadCache, saveCache } from '../../lib/cache';
 
 export default function Products() {
@@ -29,10 +29,11 @@ export default function Products() {
   if (loading) return <View style={[s.screen, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={C.accent} /></View>;
   return (
     <View style={s.screen}>
+      <GlassGlow />
       <View style={{ paddingTop: top, paddingHorizontal: 16, gap: 10 }}>
         <View style={[s.row, { justifyContent: 'space-between' }]}>
           <Text style={s.h1}>المنتجات</Text>
-          <Pressable onPress={() => router.push('/product-new' as any)} style={{ backgroundColor: C.accent, width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
+          <Pressable onPress={() => router.push('/product-new' as any)} style={{ backgroundColor: 'rgba(237,41,41,0.88)', width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', shadowColor: '#ED2929', shadowOpacity: 0.45, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } }}>
           <Text style={{ color: '#fff', fontSize: 22, fontWeight: '700', lineHeight: 24 }}>+</Text>
         </Pressable>
         </View>

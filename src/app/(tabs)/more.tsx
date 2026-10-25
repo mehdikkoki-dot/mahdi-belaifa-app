@@ -3,7 +3,7 @@ import * as Linking from 'expo-linking';
 import React, { useCallback, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { api } from '../../lib/api';
-import { BOTTOM_PAD, Card, s, useTopPad } from '../../components/ui';
+import { BOTTOM_PAD, Card, s, useTopPad, GlassGlow } from '../../components/ui';
 
 const DASHBOARD_URL = 'https://codflow-dashboard.basatbelaifa7.workers.dev';
 
@@ -25,6 +25,7 @@ export default function More() {
 
   return (
     <ScrollView style={s.screen} contentContainerStyle={[s.content, { paddingTop: top, paddingBottom: BOTTOM_PAD }]}>
+      <GlassGlow />
       <Text style={s.h1}>المزيد</Text>
       <Card style={{ alignItems: 'center', gap: 6, paddingVertical: 22 }}>
         {store?.logoUrl ? <Image source={{ uri: store.logoUrl }} style={{ width: 76, height: 76, borderRadius: 20 }} /> : null}

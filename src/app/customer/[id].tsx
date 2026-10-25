@@ -37,7 +37,7 @@ export default function CustomerDetail() {
         <KV k="العنوان" v={customer.address} />
         <KV k="عميل منذ" v={customer.createdAt ? fmtDate(customer.createdAt) : null} />
         <KV k="آخر طلب" v={customer.lastOrderAt ? fmtDate(customer.lastOrderAt) : null} />
-        <Pressable onPress={() => router.push(`/customer-new?id=${customer.id}` as any)} style={{ backgroundColor: C.accent, borderRadius: 14, paddingVertical: 11, alignItems: 'center', marginTop: 4 }}>
+        <Pressable onPress={() => router.push(`/customer-new?id=${customer.id}` as any)} style={{ backgroundColor: 'rgba(237,41,41,0.92)', borderRadius: 16, paddingVertical: 11, alignItems: 'center', marginTop: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', shadowColor: '#ED2929', shadowOpacity: 0.4, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }}>
           <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14.5 }}>تعديل العميل</Text>
         </Pressable>
         <View style={[s.row, { marginTop: 6 }]}>

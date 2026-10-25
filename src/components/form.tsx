@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { C, s, SearchBox } from './ui';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export function Field({ label, value, onChange, placeholder, keyboard, multiline }: {
   label: string; value: string; onChange: (v: string) => void; placeholder?: string;
@@ -17,7 +18,7 @@ export function Field({ label, value, onChange, placeholder, keyboard, multiline
         placeholderTextColor={C.tertiary}
         keyboardType={keyboard || 'default'}
         multiline={multiline}
-        style={{ backgroundColor: '#2C2C2E', borderColor: C.hairline, borderWidth: 0.5, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 11, color: C.label, fontSize: 15, textAlign: 'right', minHeight: multiline ? 70 : undefined }}
+        style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 11, color: C.label, fontSize: 15, textAlign: 'right', minHeight: multiline ? 70 : undefined }}
       />
     </View>
   );
@@ -39,7 +40,7 @@ export function PickerField({ label, valueLabel, placeholder, items, onPick }: {
   return (
     <View style={{ gap: 6 }}>
       <Text style={[s.sub, { color: C.label, fontWeight: '600' }]}>{label}</Text>
-      <Pressable onPress={() => setOpen(true)} style={{ backgroundColor: '#2C2C2E', borderColor: C.hairline, borderWidth: 0.5, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 12 }}>
+      <Pressable onPress={() => setOpen(true)} style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 12 }}>
         <Text style={{ color: valueLabel ? C.label : C.tertiary, fontSize: 15, textAlign: 'right' }}>{valueLabel || placeholder}</Text>
       </Pressable>
       <Modal visible={open} animationType="slide" onRequestClose={() => setOpen(false)}>
@@ -78,7 +79,7 @@ export function ChipRow({ options, value, onChange }: {
       {options.map((o) => {
         const active = value === o.value;
         return (
-          <Pressable key={o.value} onPress={() => onChange(o.value)} style={{ backgroundColor: active ? C.label : 'rgba(255,255,255,0.08)', borderColor: active ? C.label : 'rgba(255,255,255,0.14)', borderWidth: 0.8, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 }}>
+          <Pressable key={o.value} onPress={() => onChange(o.value)} style={{ backgroundColor: active ? C.label : 'rgba(255,255,255,0.10)', borderColor: active ? C.label : 'rgba(255,255,255,0.22)', borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 }}>
             <Text style={{ color: active ? '#000' : C.secondary, fontWeight: '600', fontSize: 13.5 }}>{o.label}</Text>
           </Pressable>
         );
@@ -104,8 +105,10 @@ export function QtyStepper({ qty, setQty }: { qty: number; setQty: (n: number) =
 
 export function SaveButton({ title, busy, onPress, disabled }: { title: string; busy?: boolean; onPress: () => void; disabled?: boolean }) {
   return (
-    <Pressable disabled={busy || disabled} onPress={onPress} style={{ backgroundColor: C.accent, borderRadius: 16, paddingVertical: 14, alignItems: 'center', opacity: busy || disabled ? 0.55 : 1 }}>
-      <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>{busy ? 'جارٍ الحفظ...' : title}</Text>
+    <Pressable disabled={busy || disabled} onPress={onPress} style={{ borderRadius: 18, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', opacity: busy || disabled ? 0.55 : 1, shadowColor: '#ED2929', shadowOpacity: 0.4, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }}>
+      <LinearGradient colors={['#FF5147', '#ED2929', '#C81E1E']} locations={[0, 0.55, 1]} style={{ paddingVertical: 14, alignItems: 'center' }}>
+        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>{busy ? 'جارٍ الحفظ...' : title}</Text>
+      </LinearGradient>
     </Pressable>
   );
 }
