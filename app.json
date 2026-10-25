@@ -8,7 +8,6 @@
     "scheme": "mahdibelaifa",
     "userInterfaceStyle": "dark",
     "ios": {
-      "icon": "./assets/expo.icon",
       "bundleIdentifier": "app.cranberry686.monkey5896"
     },
     "android": {
@@ -30,8 +29,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#000000",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "image": "./assets/images/icon.png",
+          "imageWidth": 120
         }
       ],
       [

@@ -1,7 +1,7 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
 import React, { useCallback, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { api } from '../../lib/api';
 import { BOTTOM_PAD, Card, s, useTopPad } from '../../components/ui';
 
@@ -27,6 +27,7 @@ export default function More() {
     <ScrollView style={s.screen} contentContainerStyle={[s.content, { paddingTop: top, paddingBottom: BOTTOM_PAD }]}>
       <Text style={s.h1}>المزيد</Text>
       <Card style={{ alignItems: 'center', gap: 6, paddingVertical: 22 }}>
+        {store?.logoUrl ? <Image source={{ uri: store.logoUrl }} style={{ width: 76, height: 76, borderRadius: 20 }} /> : null}
         <Text style={[s.h2, { fontSize: 20 }]}>{store?.name || 'Mahdi Belaifa'}</Text>
         <Text style={s.sub}>لوحة تحكم الطلبات</Text>
       </Card>

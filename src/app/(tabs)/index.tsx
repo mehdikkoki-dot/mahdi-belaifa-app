@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { ALL_STATUSES, api, dzd, IN_PROGRESS, orderTotalOf, relTime, STATUS_COLOR, STATUS_LABEL } from '../../lib/api';
 import { AnimNum, Bar, BOTTOM_PAD, C, Card, s, StatusPill, useTopPad } from '../../components/ui';
 import { loadCache, saveCache } from '../../lib/cache';
@@ -9,6 +9,7 @@ export default function Dashboard() {
   const router = useRouter();
   const top = useTopPad();
   const [stats, setStats] = useState<any[]>([]);
+  const [store, setStore] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -17,6 +18,7 @@ export default function Dashboard() {
   const load = useCallback(async () => {
     try {
       const [st, or] = await Promise.all([api.stats(), api.orders()]);
+      api.store().then(setStore).catch(() => {});
       setStats(Array.isArray(st) ? st : []);
       setOrders(Array.isArray(or) ? or : []);
       setErr('');
@@ -56,9 +58,12 @@ export default function Dashboard() {
   if (loading) return <View style={[s.screen, { justifyContent: 'center' }]}><ActivityIndicator size="large" color={C.accent} /></View>;
   return (
     <ScrollView style={s.screen} contentContainerStyle={[s.content, { paddingTop: top, paddingBottom: BOTTOM_PAD }]} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={C.accent} />}>
-      <View>
-        <Text style={s.h1}>لوحة التحكم</Text>
-        <Text style={s.sub}>نظرة عامة على متجرك وطلباتك</Text>
+      <View style={[s.row, { gap: 12 }]}>
+        {store?.logoUrl ? <Image source={{ uri: store.logoUrl }} style={{ width: 52, height: 52, borderRadius: 15 }} /> : null}
+        <View style={s.grow}>
+          <Text style={s.h1}>لوحة التحكم</Text>
+          <Text style={s.sub}>{store?.name || 'Mahdi Belaifa'} — نظرة عامة على متجرك وطلباتك</Text>
+        </View>
       </View>
       {err ? <Text style={[s.sub, { color: '#F2A199' }]}>{err}</Text> : null}
 
