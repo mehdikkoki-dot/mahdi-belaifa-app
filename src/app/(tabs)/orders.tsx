@@ -1,4 +1,4 @@
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, SectionList, Share, Text, View } from 'react-native';
@@ -19,6 +19,10 @@ export default function Orders() {
   const top = useTopPad();
   const [orders, setOrders] = useState<any[]>([]);
   const [filter, setFilter] = useState<string>('all');
+  const params = useLocalSearchParams<{ filter?: string }>();
+  React.useEffect(() => {
+    if (params.filter && (params.filter === 'all' || ALL_STATUSES.includes(params.filter))) setFilter(params.filter);
+  }, [params.filter]);
   const [q, setQ] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -62,8 +66,8 @@ export default function Orders() {
           <Text style={s.h1}>الطلبات</Text>
           <View style={[s.row, { gap: 8 }]}>
             <GlassButton title="تصدير" small variant="ghost" onPress={exportCsv} />
-            <Pressable onPress={() => router.push('/order-new' as any)} style={{ backgroundColor: 'rgba(237,41,41,0.34)', width: 40, height: 40, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,140,130,0.55)' }}>
-              <Text style={{ color: '#fff', fontSize: 22, fontWeight: '700', lineHeight: 24 }}>+</Text>
+            <Pressable onPress={() => router.push('/order-new' as any)} style={{ backgroundColor: 'rgba(130,154,137,0.38)', width: 40, height: 40, borderRadius: 999, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(110,134,118,0.55)' }}>
+              <Text style={{ color: '#2E4B38', fontSize: 22, fontWeight: '700', lineHeight: 24 }}>+</Text>
             </Pressable>
           </View>
         </View>
@@ -74,8 +78,8 @@ export default function Orders() {
           const isActive = filter === k;
           const n = k === 'all' ? orders.length : orders.filter((o) => o.status === k).length;
           return (
-            <Pressable key={k} onPress={() => setFilter(k)} style={{ backgroundColor: isActive ? C.label : 'rgba(255,255,255,0.08)', borderColor: isActive ? C.label : 'rgba(255,255,255,0.20)', borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 }}>
-              <Text style={{ color: isActive ? '#000' : C.secondary, fontWeight: '600', fontSize: 13 }}>{k === 'all' ? `الكل (${n})` : `${STATUS_LABEL[k]} (${n})`}</Text>
+            <Pressable key={k} onPress={() => setFilter(k)} style={{ backgroundColor: isActive ? C.label : 'rgba(255,255,255,0.55)', borderColor: isActive ? C.label : 'rgba(41,45,50,0.12)', borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 }}>
+              <Text style={{ color: isActive ? '#F5F4F0' : C.secondary, fontWeight: '600', fontSize: 13 }}>{k === 'all' ? `الكل (${n})` : `${STATUS_LABEL[k]} (${n})`}</Text>
             </Pressable>
           );
         })}

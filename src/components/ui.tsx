@@ -5,13 +5,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const C = {
-  canvas: '#000000',
-  card: '#1C1C1E',
-  hairline: 'rgba(255,255,255,0.09)',
-  label: '#F5F5F7',
-  secondary: 'rgba(255,255,255,0.55)',
-  tertiary: 'rgba(255,255,255,0.35)',
-  accent: '#ED2929',
+  canvas: '#F5F4F0',
+  card: '#FFFFFF',
+  hairline: 'rgba(41,45,50,0.10)',
+  label: '#292D32',
+  secondary: '#858982',
+  tertiary: 'rgba(41,45,50,0.38)',
+  accent: '#829A89',
 };
 
 export const s = StyleSheet.create({
@@ -37,12 +37,12 @@ export const BOTTOM_PAD = 118;
 export function Card({ children, style }: { children: React.ReactNode; style?: any }) {
   return (
     <View style={[{
-      borderRadius: 26, borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)',
-      backgroundColor: 'rgba(30,30,32,0.52)', overflow: 'hidden',
-      shadowColor: '#000', shadowOpacity: 0.35, shadowRadius: 14, shadowOffset: { width: 0, height: 6 },
+      borderRadius: 22, borderWidth: 1, borderColor: 'rgba(41,45,50,0.08)',
+      backgroundColor: 'rgba(255,255,255,0.66)', overflow: 'hidden',
+      shadowColor: '#292D32', shadowOpacity: 0.07, shadowRadius: 16, shadowOffset: { width: 0, height: 6 },
     }, style]}>
-      <BlurView intensity={55} tint="dark" style={StyleSheet.absoluteFill} />
-      <LinearGradient colors={['rgba(255,255,255,0.11)', 'rgba(255,255,255,0.02)', 'rgba(255,255,255,0)']} locations={[0, 0.45, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
+      <BlurView intensity={55} tint="light" style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['rgba(255,255,255,0.55)', 'rgba(255,255,255,0.10)', 'rgba(255,255,255,0)']} locations={[0, 0.45, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
       <View style={{ padding: 16 }}>{children}</View>
     </View>
   );
@@ -50,10 +50,10 @@ export function Card({ children, style }: { children: React.ReactNode; style?: a
 
 export type GlassVariant = 'primary' | 'neutral' | 'green' | 'ghost';
 const GLASS_COLORS: Record<GlassVariant, { bg: string; border: string; text: string; glow?: string }> = {
-  primary: { bg: 'rgba(237,41,41,0.34)', border: 'rgba(255,140,130,0.55)', text: '#FFFFFF', glow: '#ED2929' },
-  neutral: { bg: 'rgba(255,255,255,0.10)', border: 'rgba(255,255,255,0.28)', text: '#F5F5F7' },
-  green: { bg: 'rgba(46,160,90,0.30)', border: 'rgba(110,231,160,0.50)', text: '#C9F5DA', glow: '#2EA05A' },
-  ghost: { bg: 'rgba(255,255,255,0.05)', border: 'rgba(255,255,255,0.16)', text: 'rgba(255,255,255,0.75)' },
+  primary: { bg: 'rgba(130,154,137,0.38)', border: 'rgba(110,134,118,0.55)', text: '#2E4B38', glow: '#829A89' },
+  neutral: { bg: 'rgba(255,255,255,0.55)', border: 'rgba(41,45,50,0.14)', text: '#292D32' },
+  green: { bg: 'rgba(139,170,150,0.35)', border: 'rgba(120,155,135,0.55)', text: '#2E4B38', glow: '#8BAA96' },
+  ghost: { bg: 'rgba(255,255,255,0.35)', border: 'rgba(41,45,50,0.10)', text: '#5A5E58' },
 };
 
 /** iOS 26-style Liquid Glass pill button: frosted blur, bright rim, specular top light. */
@@ -73,8 +73,8 @@ export function GlassButton({ title, onPress, variant = 'neutral', small, flex, 
         transform: [{ scale: pressed && !disabled ? 0.965 : 1 }],
         shadowColor: c.glow || '#000', shadowOpacity: c.glow ? 0.45 : 0.25, shadowRadius: c.glow ? 14 : 8, shadowOffset: { width: 0, height: 5 },
       })}>
-      <BlurView intensity={45} tint="dark" style={StyleSheet.absoluteFill} />
-      <LinearGradient colors={['rgba(255,255,255,0.22)', 'rgba(255,255,255,0.04)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
+      <BlurView intensity={45} tint="light" style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['rgba(255,255,255,0.50)', 'rgba(255,255,255,0.10)', 'rgba(255,255,255,0)']} locations={[0, 0.5, 1]} style={StyleSheet.absoluteFill} pointerEvents="none" />
       <Text style={{ color: c.text, fontWeight: '700', fontSize: small ? 13 : 15, textAlign: 'center', paddingVertical: small ? 8 : 13, paddingHorizontal: small ? 14 : 20 }}>{title}</Text>
     </Pressable>
   );
@@ -84,7 +84,7 @@ export function GlassButton({ title, onPress, variant = 'neutral', small, flex, 
 export function GlassGlow() {
   return (
     <LinearGradient
-      colors={['rgba(237,41,41,0.22)', 'rgba(237,41,41,0.06)', 'rgba(0,0,0,0)']}
+      colors={['rgba(130,154,137,0.13)', 'rgba(130,154,137,0.04)', 'rgba(245,244,240,0)']}
       locations={[0, 0.55, 1]}
       style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 360 }}
       pointerEvents="none"
@@ -109,7 +109,7 @@ export function Bar({ pct, color }: { pct: number; color: string }) {
   }, [pct, w]);
   const width = w.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] });
   return (
-    <View style={{ height: 8, borderRadius: 99, backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden', flex: 1 }}>
+    <View style={{ height: 8, borderRadius: 99, backgroundColor: 'rgba(41,45,50,0.08)', overflow: 'hidden', flex: 1 }}>
       <Animated.View style={{ height: '100%', width, backgroundColor: color, borderRadius: 99 }} />
     </View>
   );
@@ -158,7 +158,7 @@ export function SearchBox({ value, onChange, placeholder }: { value: string; onC
       onChangeText={onChange}
       placeholder={placeholder}
       placeholderTextColor={C.tertiary}
-      style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.18)', borderWidth: 1, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 11, color: C.label, fontSize: 15, textAlign: 'right' }}
+      style={{ backgroundColor: 'rgba(255,255,255,0.65)', borderColor: 'rgba(41,45,50,0.12)', borderWidth: 1, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 11, color: C.label, fontSize: 15, textAlign: 'right' }}
     />
   );
 }

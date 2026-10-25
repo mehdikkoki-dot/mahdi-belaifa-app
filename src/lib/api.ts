@@ -49,9 +49,9 @@ export const STATUS_LABEL: Record<string, string> = {
   delivered: 'تم التوصيل', returned: 'مرتجع', cancelled: 'ملغي',
 };
 export const STATUS_COLOR: Record<string, string> = {
-  new: '#9CA1A6', confirmed: '#A68CFA', unreachable: '#F2A199', preparing: '#F0D489',
-  ready: '#8AB5F7', assigned: '#CCBDF7', dispatched: '#5EBFC7', out_for_delivery: '#F5BF91',
-  delivered: '#59D98C', returned: '#F5BAB2', cancelled: '#6E7075',
+  new: '#8294A8', confirmed: '#829A89', unreachable: '#C7A46A', preparing: '#B3A284',
+  ready: '#8BAA96', assigned: '#93A5B8', dispatched: '#8294A8', out_for_delivery: '#94A3B8',
+  delivered: '#7FA98C', returned: '#C58F8F', cancelled: '#A39E96',
 };
 export const STATUS_FLOW = ['new', 'confirmed', 'preparing', 'ready', 'assigned', 'dispatched', 'out_for_delivery', 'delivered'];
 export const ALL_STATUSES = ['new', 'confirmed', 'unreachable', 'preparing', 'ready', 'assigned', 'dispatched', 'out_for_delivery', 'delivered', 'returned', 'cancelled'];

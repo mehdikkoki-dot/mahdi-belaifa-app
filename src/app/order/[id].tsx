@@ -24,6 +24,16 @@ export default function OrderDetail() {
 
   const setStatus = async (st: string) => {
     if (!order || busy) return;
+    if (st === 'cancelled' || st === 'returned') {
+      const label = STATUS_LABEL[st];
+      const ok = await new Promise<boolean>((resolve) => {
+        Alert.alert('تأكيد', `تغيير حالة الطلب إلى «${label}»؟`, [
+          { text: 'لا', style: 'cancel', onPress: () => resolve(false) },
+          { text: 'نعم', style: 'destructive', onPress: () => resolve(true) },
+        ]);
+      });
+      if (!ok) return;
+    }
     setBusy(true);
     try { await api.setStatus(order.id, st); setOrder({ ...order, status: st }); }
     catch { Alert.alert('خطأ', 'تعذر تغيير حالة الطلب'); }
@@ -98,11 +108,11 @@ export default function OrderDetail() {
         <KV k="رقم التتبع" v={order.trackingNumber} />
         <KV k="ملاحظات" v={order.notes} />
         <View style={[s.row, { marginTop: 6 }]}>
-          <Pressable style={{ flex: 1, backgroundColor: '#21301F', borderRadius: 14, paddingVertical: 11, alignItems: 'center' }} onPress={() => order.phone && Linking.openURL(`tel:${order.phone}`)}>
-            <Text style={{ color: '#59D98C', fontWeight: '700', fontSize: 14 }}>اتصال</Text>
+          <Pressable style={{ flex: 1, backgroundColor: 'rgba(139,170,150,0.25)', borderRadius: 14, paddingVertical: 11, alignItems: 'center' }} onPress={() => order.phone && Linking.openURL(`tel:${order.phone}`)}>
+            <Text style={{ color: '#2E4B38', fontWeight: '700', fontSize: 14 }}>اتصال</Text>
           </Pressable>
-          <Pressable style={{ flex: 1, backgroundColor: '#12291C', borderRadius: 14, paddingVertical: 11, alignItems: 'center' }} onPress={() => order.phone && Linking.openURL(`https://wa.me/${waNumber(order.phone)}`)}>
-            <Text style={{ color: '#59D98C', fontWeight: '700', fontSize: 14 }}>WhatsApp</Text>
+          <Pressable style={{ flex: 1, backgroundColor: 'rgba(139,170,150,0.18)', borderRadius: 14, paddingVertical: 11, alignItems: 'center' }} onPress={() => order.phone && Linking.openURL(`https://wa.me/${waNumber(order.phone)}`)}>
+            <Text style={{ color: '#2E4B38', fontWeight: '700', fontSize: 14 }}>WhatsApp</Text>
           </Pressable>
         </View>
       </Card>
@@ -121,8 +131,8 @@ export default function OrderDetail() {
       <Card style={{ gap: 10 }}>
         <Text style={s.h2}>تغيير الحالة</Text>
         {next ? (
-          <Pressable disabled={busy} onPress={() => setStatus(next)} style={{ backgroundColor: 'rgba(237,41,41,0.92)', borderRadius: 16, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', shadowColor: '#ED2929', shadowOpacity: 0.4, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, opacity: busy ? 0.6 : 1 }}>
-            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>التالي: {STATUS_LABEL[next]}</Text>
+          <Pressable disabled={busy} onPress={() => setStatus(next)} style={{ backgroundColor: 'rgba(130,154,137,0.85)', borderRadius: 999, paddingVertical: 12, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(110,134,118,0.5)', shadowColor: '#829A89', shadowOpacity: 0.35, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, opacity: busy ? 0.6 : 1 }}>
+            <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 15 }}>التالي: {STATUS_LABEL[next]}</Text>
           </Pressable>
         ) : null}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>

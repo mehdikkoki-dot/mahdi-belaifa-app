@@ -32,6 +32,7 @@ export default function More() {
         <Text style={[s.h2, { fontSize: 20 }]}>{store?.name || 'Mahdi Belaifa'}</Text>
         <Text style={s.sub}>لوحة تحكم الطلبات</Text>
       </Card>
+      <Row title="العملاء" sub="قائمة العملاء وسجل طلباتهم" onPress={() => router.push('/customers' as any)} />
       <Row title="العروض والخصومات" sub="عروض المتجر النشطة" onPress={() => router.push('/offers' as any)} />
       <Row title="الطلبات المهجورة" sub="طلبات لم تُكمل وإحصائياتها" onPress={() => router.push('/abandoned' as any)} />
       <Row title="المخزون" sub="نظرة عامة على مخزون المنتجات" onPress={() => router.push('/stock' as any)} />

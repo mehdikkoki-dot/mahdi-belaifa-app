@@ -17,7 +17,7 @@ export function Field({ label, value, onChange, placeholder, keyboard, multiline
         placeholderTextColor={C.tertiary}
         keyboardType={keyboard || 'default'}
         multiline={multiline}
-        style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 11, color: C.label, fontSize: 15, textAlign: 'right', minHeight: multiline ? 70 : undefined }}
+        style={{ backgroundColor: 'rgba(255,255,255,0.65)', borderColor: 'rgba(41,45,50,0.12)', borderWidth: 1, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 11, color: C.label, fontSize: 15, textAlign: 'right', minHeight: multiline ? 70 : undefined }}
       />
     </View>
   );
@@ -39,14 +39,14 @@ export function PickerField({ label, valueLabel, placeholder, items, onPick }: {
   return (
     <View style={{ gap: 6 }}>
       <Text style={[s.sub, { color: C.label, fontWeight: '600' }]}>{label}</Text>
-      <Pressable onPress={() => setOpen(true)} style={{ backgroundColor: 'rgba(255,255,255,0.07)', borderColor: 'rgba(255,255,255,0.16)', borderWidth: 1, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 12 }}>
+      <Pressable onPress={() => setOpen(true)} style={{ backgroundColor: 'rgba(255,255,255,0.65)', borderColor: 'rgba(41,45,50,0.12)', borderWidth: 1, borderRadius: 14, paddingHorizontal: 13, paddingVertical: 12 }}>
         <Text style={{ color: valueLabel ? C.label : C.tertiary, fontSize: 15, textAlign: 'right' }}>{valueLabel || placeholder}</Text>
       </Pressable>
       <Modal visible={open} animationType="slide" onRequestClose={() => setOpen(false)}>
         <View style={{ flex: 1, backgroundColor: C.canvas, paddingTop: insets.top + 10, paddingHorizontal: 16, paddingBottom: insets.bottom + 12 }}>
           <View style={[s.row, { justifyContent: 'space-between', marginBottom: 10 }]}>
             <Text style={s.h2}>{label}</Text>
-            <Pressable onPress={() => setOpen(false)} style={{ backgroundColor: '#2C2C2E', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 }}>
+            <Pressable onPress={() => setOpen(false)} style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderWidth: 1, borderColor: 'rgba(41,45,50,0.12)', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7 }}>
               <Text style={{ color: C.label, fontWeight: '600' }}>إغلاق</Text>
             </Pressable>
           </View>
@@ -78,8 +78,8 @@ export function ChipRow({ options, value, onChange }: {
       {options.map((o) => {
         const active = value === o.value;
         return (
-          <Pressable key={o.value} onPress={() => onChange(o.value)} style={{ backgroundColor: active ? C.label : 'rgba(255,255,255,0.10)', borderColor: active ? C.label : 'rgba(255,255,255,0.22)', borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 }}>
-            <Text style={{ color: active ? '#000' : C.secondary, fontWeight: '600', fontSize: 13.5 }}>{o.label}</Text>
+          <Pressable key={o.value} onPress={() => onChange(o.value)} style={{ backgroundColor: active ? C.label : 'rgba(255,255,255,0.55)', borderColor: active ? C.label : 'rgba(41,45,50,0.14)', borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 }}>
+            <Text style={{ color: active ? '#F5F4F0' : C.secondary, fontWeight: '600', fontSize: 13.5 }}>{o.label}</Text>
           </Pressable>
         );
       })}
@@ -89,7 +89,7 @@ export function ChipRow({ options, value, onChange }: {
 
 export function QtyStepper({ qty, setQty }: { qty: number; setQty: (n: number) => void }) {
   const Btn = ({ t, fn }: { t: string; fn: () => void }) => (
-    <Pressable onPress={fn} style={{ width: 40, height: 40, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.10)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center' }}>
+    <Pressable onPress={fn} style={{ width: 40, height: 40, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.6)', borderWidth: 1, borderColor: 'rgba(41,45,50,0.14)', alignItems: 'center', justifyContent: 'center' }}>
       <Text style={{ color: C.label, fontSize: 19, fontWeight: '700' }}>{t}</Text>
     </Pressable>
   );

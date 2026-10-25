@@ -21,12 +21,12 @@ function LockGate({ children }: { children: React.ReactNode }) {
     } catch { setLocked(false); }
   }, []);
   React.useEffect(() => { check(); }, [check]);
-  if (locked === null) return <View style={{ flex: 1, backgroundColor: '#000' }} />;
+  if (locked === null) return <View style={{ flex: 1, backgroundColor: '#F5F4F0' }} />;
   if (locked) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#000', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 }}>
-        <Text style={{ color: '#F5F5F7', fontSize: 20, fontWeight: '700' }}>التطبيق مقفل</Text>
-        <Pressable onPress={check} style={{ backgroundColor: '#ED2929', borderRadius: 14, paddingHorizontal: 22, paddingVertical: 12 }}>
+      <View style={{ flex: 1, backgroundColor: '#F5F4F0', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 }}>
+        <Text style={{ color: '#292D32', fontSize: 20, fontWeight: '700' }}>التطبيق مقفل</Text>
+        <Pressable onPress={check} style={{ backgroundColor: '#829A89', borderRadius: 999, paddingHorizontal: 22, paddingVertical: 12 }}>
           <Text style={{ color: '#fff', fontWeight: '700' }}>فتح بـ Face ID</Text>
         </Pressable>
       </View>
@@ -40,10 +40,10 @@ export default function RootLayout() {
     <LockGate>
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: '#000000' },
-        headerTintColor: '#FFFFFF',
+        headerStyle: { backgroundColor: '#F5F4F0' },
+        headerTintColor: '#292D32',
         headerTitleStyle: { fontWeight: '700' },
-        contentStyle: { backgroundColor: '#000000' },
+        contentStyle: { backgroundColor: '#F5F4F0' },
       }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="order/[id]" options={{ title: 'تفاصيل الطلب' }} />
@@ -61,6 +61,7 @@ export default function RootLayout() {
       <Stack.Screen name="reviews" options={{ title: 'التقييمات' }} />
       <Stack.Screen name="settings" options={{ title: 'الإعدادات' }} />
       <Stack.Screen name="today" options={{ title: 'توصيل اليوم' }} />
+      <Stack.Screen name="customers" options={{ title: 'العملاء' }} />
       <Stack.Screen name="search" options={{ title: 'بحث شامل' }} />
     </Stack>
     </LockGate>

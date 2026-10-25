@@ -26,7 +26,7 @@ export default function Reviews() {
       {list.length === 0 ? <Text style={s.sub}>لا توجد تقييمات بعد.</Text> : list.map((r) => (
         <Card key={r.id} style={{ gap: 5 }}>
           <View style={[s.row, { justifyContent: 'space-between' }]}>
-            <Text style={{ color: '#F5C26B', fontSize: 15 }}>{stars(r.rating)}</Text>
+            <Text style={{ color: '#C7A46A', fontSize: 15 }}>{stars(r.rating)}</Text>
             <Text style={s.sub}>{r.status === 'approved' ? 'معتمد' : r.status === 'pending' ? 'بانتظار الموافقة' : r.status || ''}</Text>
           </View>
           {r.productName ? <Text style={[s.txt, { fontWeight: '600' }]}>{r.productName}</Text> : null}

@@ -128,8 +128,8 @@ export default function OrderNew() {
               <Text style={s.sub}>{[l.variantLabel, `${dzd(l.pricePerUnit)} × ${l.quantity}`].filter(Boolean).join(' · ')}</Text>
             </View>
             <Text style={[s.txt, { fontWeight: '700' }]}>{dzd(l.lineTotal)}</Text>
-            <Pressable onPress={() => setLines(lines.filter((_, j) => j !== i))} style={{ backgroundColor: '#3A2323', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6 }}>
-              <Text style={{ color: '#F2A199', fontWeight: '700', fontSize: 12.5 }}>حذف</Text>
+            <Pressable onPress={() => setLines(lines.filter((_, j) => j !== i))} style={{ backgroundColor: 'rgba(197,143,143,0.18)', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 6 }}>
+              <Text style={{ color: '#A85F5F', fontWeight: '700', fontSize: 12.5 }}>حذف</Text>
             </Pressable>
           </View>
         ))}
@@ -145,7 +145,7 @@ export default function OrderNew() {
           <QtyStepper qty={qty} setQty={setQty} />
         </View>
         {product ? <Text style={s.sub}>سعر الوحدة: {dzd(unitPrice)}</Text> : null}
-        <Pressable onPress={addLine} style={{ backgroundColor: '#2C2C2E', borderRadius: 14, paddingVertical: 11, alignItems: 'center' }}>
+        <Pressable onPress={addLine} style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderWidth: 1, borderColor: 'rgba(41,45,50,0.12)', borderRadius: 14, paddingVertical: 11, alignItems: 'center' }}>
           <Text style={{ color: C.label, fontWeight: '700' }}>+ أضف إلى الطلب</Text>
         </Pressable>
       </Card>

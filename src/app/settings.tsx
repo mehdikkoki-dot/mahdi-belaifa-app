@@ -56,7 +56,7 @@ export default function Settings() {
             <Text style={[s.txt, { fontWeight: '600' }]}>قفل التطبيق بـ Face ID</Text>
             <Text style={s.sub}>{bioOk ? 'يُطلب التحقق عند فتح التطبيق' : 'Face ID غير مهيأ على هذا الجهاز'}</Text>
           </View>
-          <Switch value={lock} onValueChange={toggleLock} disabled={!bioOk} trackColor={{ true: C.accent, false: 'rgba(255,255,255,0.15)' }} />
+          <Switch value={lock} onValueChange={toggleLock} disabled={!bioOk} trackColor={{ true: C.accent, false: 'rgba(41,45,50,0.15)' }} />
         </View>
       </Card>
       <Card style={{ gap: 4 }}>
