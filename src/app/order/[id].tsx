@@ -36,7 +36,7 @@ export default function OrderDetail() {
   const items: any[] = order.products || order.items || [];
   const shareSummary = () => {
     const lines = [
-      `طلب ${order.orderNumber || ''} — Mahdi Belaifa`,
+      `طلب ${order.orderNumber || ''} — SOUR`,
       `الزبون: ${order.customerName || ''} · ${order.phone || ''}`,
       place ? `المكان: ${place}` : null,
       order.address ? `العنوان: ${order.address}` : null,

@@ -16,7 +16,7 @@ function LockGate({ children }: { children: React.ReactNode }) {
       if (!on) { setLocked(false); return; }
       const ok = (await LocalAuthentication.hasHardwareAsync()) && (await LocalAuthentication.isEnrolledAsync());
       if (!ok) { setLocked(false); return; }
-      const res = await LocalAuthentication.authenticateAsync({ promptMessage: 'فتح تطبيق Mahdi Belaifa', cancelLabel: 'إلغاء' });
+      const res = await LocalAuthentication.authenticateAsync({ promptMessage: 'فتح تطبيق SOUR', cancelLabel: 'إلغاء' });
       setLocked(!res.success);
     } catch { setLocked(false); }
   }, []);

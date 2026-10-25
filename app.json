@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Mahdi Belaifa",
+    "name": "SOUR",
     "slug": "mahdi-belaifa",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -36,7 +36,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "استخدم Face ID لفتح تطبيق Mahdi Belaifa"
+          "faceIDPermission": "استخدم Face ID لفتح تطبيق SOUR"
         }
       ]
     ],

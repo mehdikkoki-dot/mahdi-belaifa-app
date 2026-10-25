@@ -24,7 +24,7 @@ export default function Settings() {
 
   const toggleLock = async (v: boolean) => {
     if (v) {
-      const res = await LocalAuthentication.authenticateAsync({ promptMessage: 'تفعيل قفل التطبيق' }).catch(() => null);
+      const res = await LocalAuthentication.authenticateAsync({ promptMessage: 'تفعيل قفل تطبيق SOUR' }).catch(() => null);
       if (!res?.success) { Alert.alert('تنبيه', 'يلزم تأكيد هويتك لتفعيل القفل'); return; }
     }
     setLock(v);
@@ -61,7 +61,7 @@ export default function Settings() {
       </Card>
       <Card style={{ gap: 4 }}>
         <Text style={s.h2}>حول</Text>
-        <Text style={s.sub}>Mahdi Belaifa — تطبيق إدارة الطلبات (COD). بدون إنترنت، يعرض التطبيق آخر بيانات محفوظة.</Text>
+        <Text style={s.sub}>SOUR — تطبيق إدارة طلبات متجر Mahdi Belaifa (COD). بدون إنترنت، يعرض التطبيق آخر بيانات محفوظة.</Text>
       </Card>
     </ScrollView>
   );

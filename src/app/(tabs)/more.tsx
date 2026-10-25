@@ -44,7 +44,7 @@ export default function More() {
         <Text style={s.txt}>حول التطبيق</Text>
         <Text style={s.sub}>تطبيق إدارة طلبات متجر Mahdi Belaifa — الدفع عند الاستلام. نفس محتوى لوحة الويب، بشريط زجاجي أصلي من iOS.</Text>
       </Card>
-      <Text style={[s.sub, { textAlign: 'center' }]}>Mahdi Belaifa · Expo</Text>
+      <Text style={[s.sub, { textAlign: 'center' }]}>SOUR</Text>
     </ScrollView>
   );
 }
