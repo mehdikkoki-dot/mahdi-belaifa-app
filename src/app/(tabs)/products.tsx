@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
 import { api, dzd } from '../../lib/api';
 import { BOTTOM_PAD, C, Card, s, SearchBox, useTopPad } from '../../components/ui';
+import { loadCache, saveCache } from '../../lib/cache';
 
 export default function Products() {
   const router = useRouter();
@@ -13,7 +14,8 @@ export default function Products() {
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    try { setProducts(await api.products()); } catch { /* keep last */ }
+    try { const data = await api.products(); setProducts(data); saveCache('products', data); }
+    catch { const cached = await loadCache('products'); if (cached) setProducts(cached); }
     setLoading(false); setRefreshing(false);
   }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));

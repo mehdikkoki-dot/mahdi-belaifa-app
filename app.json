@@ -33,6 +33,12 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "استخدم Face ID لفتح تطبيق Mahdi Belaifa"
+        }
       ]
     ],
     "experiments": {

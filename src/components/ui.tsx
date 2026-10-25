@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const C = {
@@ -47,10 +47,40 @@ export function StatusPill({ status }: { status?: string }) {
 }
 
 export function Bar({ pct, color }: { pct: number; color: string }) {
+  const w = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(w, { toValue: Math.min(100, Math.max(0, pct)), duration: 700, useNativeDriver: false }).start();
+  }, [pct, w]);
+  const width = w.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] });
   return (
     <View style={{ height: 8, borderRadius: 99, backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden', flex: 1 }}>
-      <View style={{ height: '100%', width: `${Math.min(100, Math.max(0, pct))}%`, backgroundColor: color, borderRadius: 99 }} />
+      <Animated.View style={{ height: '100%', width, backgroundColor: color, borderRadius: 99 }} />
     </View>
+  );
+}
+
+/** Number that counts up when it appears or changes. */
+export function AnimNum({ value, format }: { value: number; format?: (n: number) => string }) {
+  const anim = useRef(new Animated.Value(0)).current;
+  const [display, setDisplay] = useState(0);
+  useEffect(() => {
+    const id = anim.addListener(({ value: v }) => setDisplay(Math.round(v)));
+    Animated.timing(anim, { toValue: value, duration: 650, useNativeDriver: false }).start();
+    return () => { anim.removeListener(id); };
+  }, [value, anim]);
+  return <>{format ? format(display) : String(display)}</>;
+}
+
+/** Fades + slides children in, staggered by index. */
+export function FadeIn({ index = 0, children }: { index?: number; children: React.ReactNode }) {
+  const anim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(anim, { toValue: 1, duration: 380, delay: Math.min(index, 8) * 55, useNativeDriver: true }).start();
+  }, [anim, index]);
+  return (
+    <Animated.View style={{ opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] }) }] }}>
+      {children}
+    </Animated.View>
   );
 }
 

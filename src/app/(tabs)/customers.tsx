@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { api, dzd } from '../../lib/api';
 import { BOTTOM_PAD, C, Card, s, SearchBox, useTopPad } from '../../components/ui';
+import { loadCache, saveCache } from '../../lib/cache';
 
 export default function Customers() {
   const router = useRouter();
@@ -13,7 +14,8 @@ export default function Customers() {
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    try { setCustomers(await api.customers()); } catch { /* keep last */ }
+    try { const data = await api.customers(); setCustomers(data); saveCache('customers', data); }
+    catch { const cached = await loadCache('customers'); if (cached) setCustomers(cached); }
     setLoading(false); setRefreshing(false);
   }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));

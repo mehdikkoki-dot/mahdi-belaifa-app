@@ -2,7 +2,8 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { ALL_STATUSES, api, dzd, orderTotalOf, relTime, STATUS_LABEL } from '../../lib/api';
-import { BOTTOM_PAD, C, Card, s, SearchBox, StatusPill, useTopPad } from '../../components/ui';
+import { BOTTOM_PAD, C, Card, FadeIn, s, SearchBox, StatusPill, useTopPad } from '../../components/ui';
+import { loadCache, saveCache } from '../../lib/cache';
 
 export default function Orders() {
   const router = useRouter();
@@ -14,7 +15,8 @@ export default function Orders() {
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    try { setOrders(await api.orders()); } catch { /* keep last */ }
+    try { const data = await api.orders(); setOrders(data); saveCache('orders', data); }
+    catch { const cached = await loadCache('orders'); if (cached) setOrders(cached); }
     setLoading(false); setRefreshing(false);
   }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -56,7 +58,8 @@ export default function Orders() {
         contentContainerStyle={{ padding: 16, paddingTop: 4, gap: 12, paddingBottom: BOTTOM_PAD }}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={C.accent} />}
         ListEmptyComponent={<Text style={s.sub}>لا توجد طلبات مطابقة.</Text>}
-        renderItem={({ item: o }) => (
+        renderItem={({ item: o, index }) => (
+          <FadeIn index={index}>
           <Pressable onPress={() => router.push(`/order/${o.id}` as any)}>
             <Card>
               <View style={s.row}>
@@ -73,6 +76,7 @@ export default function Orders() {
               </View>
             </Card>
           </Pressable>
+          </FadeIn>
         )}
       />
     </View>
