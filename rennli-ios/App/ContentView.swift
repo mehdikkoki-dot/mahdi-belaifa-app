@@ -426,8 +426,8 @@ struct ConnectView: View {
                 .frame(width: 118, height: 118)
                 .clipShape(RoundedRectangle(cornerRadius: 28))
                 .shadow(color: Theme.orange.opacity(0.42), radius: 22, y: 12)
-                .overlay(ShineSweep(corner: 28))
-                .modifier(Entrance(index: 0))
+                .shineSweep(radius: 28)
+                .entrance(0)
             BrandWordmark(size: 34, color: Theme.ink)
             Text(s.connectHint)
                 .font(.cairo(15)).foregroundStyle(Theme.tan)
@@ -536,7 +536,7 @@ struct WaitingView: View {
                     BrandWordmark(size: 16, color: Theme.ink)
                     Spacer()
                 }
-                .modifier(Entrance(index: 0))
+                .entrance(0)
                 WhiteCard {
                     VStack(spacing: 0) {
                         ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
