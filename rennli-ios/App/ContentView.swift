@@ -1,4 +1,5 @@
 import ActivityKit
+import PhotosUI
 import AudioToolbox
 import AVFoundation
 import SwiftUI
@@ -341,6 +342,19 @@ struct ConnectView: View {
     let s: Strings
     @State private var input: String = ""
     @State private var showScanner = false
+    @State private var showGallery = false
+    @State private var galleryItem: PhotosPickerItem?
+    @State private var galleryError: String = ""
+
+    /// Temporary bridge (his request): read a ticket QR from a saved photo.
+    static func decodeQR(from data: Data) -> String? {
+        guard let image = UIImage(data: data),
+              let ci = CIImage(image: image) else { return nil }
+        let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil,
+                                  options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
+        let features = detector?.features(in: ci) as? [CIQRCodeFeature]
+        return features?.first?.messageString
+    }
 
     var body: some View {
         VStack(spacing: 18) {
@@ -364,6 +378,30 @@ struct ConnectView: View {
             .buttonStyle(.borderedProminent).tint(Theme.orange)
             .sheet(isPresented: $showScanner) {
                 ScannerSheet { code in app.open(rawInput: code) }
+            }
+            Button {
+                showGallery = true
+            } label: {
+                Label(s.galleryButton, systemImage: "photo.on.rectangle.angled")
+                    .font(.cairo(16, .bold))
+                    .frame(maxWidth: .infinity).padding(.vertical, 5)
+            }
+            .buttonStyle(.bordered).tint(Theme.orange)
+            .photosPicker(isPresented: $showGallery, selection: $galleryItem, matching: .images)
+            .onChange(of: galleryItem) { _, item in
+                guard let item else { return }
+                Task {
+                    let data = try? await item.loadTransferable(type: Data.self)
+                    if let data, let code = Self.decodeQR(from: data) {
+                        galleryError = ""
+                        app.open(rawInput: code)
+                    } else {
+                        galleryError = s.qrNotFound
+                    }
+                }
+            }
+            if !galleryError.isEmpty {
+                Text(galleryError).font(.cairo(13)).foregroundStyle(.red)
             }
             Text(s.orPaste).font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
             TextField(s.linkPlaceholder, text: $input)
@@ -879,7 +917,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "6.0")
+                    LabeledContent(s.version, value: "6.1")
                 }
             }
             .navigationTitle(s.settingsTitle)

@@ -93,6 +93,8 @@ struct Strings {
     var poweredBy: String { t("يعمل بواسطة", "Propulsé par") }
     var newTicket: String { t("تذكرة جديدة", "Nouveau ticket") }
     var scanButton: String { t("امسح كود الطلب", "Scanner le code") }
+    var galleryButton: String { t("اقرأ QR من المعرض", "Lire un QR depuis la galerie") }
+    var qrNotFound: String { t("ما لقيتش كود QR في هذي الصورة", "Aucun code QR trouvé dans cette image") }
     var orPaste: String { t("ولا الصق الرابط", "ou collez le lien") }
     func etaText(_ m: Int) -> String { t("خلال \(m) دقيقة تقريباً", "dans environ \(m) min") }
     var menu: String { t("المنيو", "Menu") }
