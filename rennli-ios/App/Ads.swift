@@ -86,8 +86,7 @@ struct AdCarouselView: View {
                         .allowsHitTesting(idx == i)
                 }
             }
-            .aspectRatio(currentAspect, contentMode: .fit)
-            .animation(.easeInOut(duration: 0.5), value: currentAspect)
+            .frame(height: 248)
             .clipShape(RoundedRectangle(cornerRadius: 24))
             .shadow(color: .black.opacity(0.16), radius: 20, y: 10)
             .contentShape(RoundedRectangle(cornerRadius: 24))
@@ -125,16 +124,6 @@ struct AdCarouselView: View {
         }
     }
 
-    private var currentAspect: CGFloat {
-        guard ads.indices.contains(idx) else { return 16.0 / 9.0 }
-        let ad = ads[idx]
-        if ad.kind == "image", let img = store.images[ad.id], img.size.height > 0 {
-            let a = img.size.width / img.size.height
-            return min(max(a, 0.85), 2.35)
-        }
-        return 16.0 / 9.0
-    }
-
     @ViewBuilder
     private func slide(_ ad: AdItem) -> some View {
         if ad.kind == "template" {
@@ -170,10 +159,8 @@ struct AdCarouselView: View {
                 if let img = store.images[ad.id] {
                     Image(uiImage: img)
                         .resizable().scaledToFill()
-                        .blur(radius: 18).opacity(0.85)
-                        .scaleEffect(reduceMotion ? 1.0 : (kb ? 1.12 : 1.03))
-                    Image(uiImage: img)
-                        .resizable().scaledToFit()
+                        .scaleEffect(reduceMotion ? 1.0 : (kb ? 1.13 : 1.02))
+                        .offset(x: reduceMotion ? 0 : (kb ? -8 : 0), y: reduceMotion ? 0 : (kb ? -5 : 0))
                 } else {
                     Color(hex: 0x2B1A12)
                 }
