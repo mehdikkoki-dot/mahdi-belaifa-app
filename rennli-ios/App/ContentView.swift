@@ -149,10 +149,11 @@ final class TicketModel: ObservableObject {
         guard let url = URL(string: "\(apiBase)/api/tickets/\(ticketId)/ack") else { return }
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
+        let request = req
         stopRinging()
         acked = true
         Task {
-            _ = try? await URLSession.shared.data(for: req)
+            _ = try? await URLSession.shared.data(for: request)
             await refresh()
         }
     }
