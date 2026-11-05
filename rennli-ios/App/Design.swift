@@ -196,6 +196,10 @@ struct PoweredBy: View {
 
     var body: some View {
         HStack(spacing: 7) {
+            Image("BrandLogo")
+                .resizable().scaledToFill()
+                .frame(width: 19, height: 19)
+                .clipShape(RoundedRectangle(cornerRadius: 5.5))
             Text(s.poweredBy)
                 .font(.cairo(12.5, .bold))
                 .foregroundStyle(dark ? .white.opacity(0.7) : Theme.tan)
@@ -218,6 +222,38 @@ struct PoweredBy: View {
 
 
 // MARK: - Motion kit (60 fps, Reduce-Motion aware)
+
+/// The brand's glossy diagonal light — two soft bands, like the logo's sheen.
+/// Parents clip it to their shape.
+struct GlossBands: View {
+    var opacity: Double = 0.13
+    var body: some View {
+        ZStack {
+            LinearGradient(colors: [.clear, .white.opacity(opacity), .clear],
+                           startPoint: .topLeading, endPoint: .bottomTrailing)
+            Rectangle()
+                .fill(LinearGradient(colors: [.clear, .white.opacity(opacity * 0.9), .clear],
+                                     startPoint: .leading, endPoint: .trailing))
+                .frame(width: 120)
+                .rotationEffect(.degrees(18))
+                .offset(x: -120, y: -40)
+                .blur(radius: 5)
+        }
+    }
+}
+
+/// The brand wordmark — heavy italic, exactly like the logo. Latin-only by
+/// design: the name stays French in every language.
+struct BrandWordmark: View {
+    var size: CGFloat = 20
+    var color: Color = .white
+    var body: some View {
+        Text("C'est Fait!")
+            .font(.system(size: size, weight: .black))
+            .italic()
+            .foregroundStyle(color)
+    }
+}
 
 /// Staggered entrance: rise + fade on a spring. Degrades to a plain
 /// fade when the system Reduce Motion setting is on.
