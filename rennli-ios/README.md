@@ -1,26 +1,40 @@
-# رنّلي — Rennli customer app (test build)
+# رنّلي Rennli — تطبيق الزبون الأصلي (iOS)
 
-Native iOS companion for the Rennli pager prototype. Connects to an existing
-ticket on https://rennli.basatbelaifa7.workers.dev, shows the order status,
-starts an iOS **Live Activity** (lock screen + Dynamic Island), and rings
-in-app when the order is ready.
+تطبيق العميل لنظام نداء الطلبات: الزبون يمسح QR الوصل، فيرنّ هاتفه عندما يجهز الطلب. بلا رقم هاتف، بلا حساب — معرّف جهاز مجهول فقط.
 
-## Build (unsigned IPA via GitHub Actions)
+**التصميم:** الاتجاه 2 «دفء النهار» (اختاره صاحب المشروع 5 نوفمبر 2026): كريمي دافئ، برتقالي `#F76707`، حبر إسبريسو `#2B1A12`، خط Cairo مدرج داخل التطبيق، الرقم هو بطل الشاشة (آخر رقم برتقالي). لوحات المقترحات في `~/workspace/rennli-design/`.
 
-1. Push this folder to a GitHub repo.
-2. The `Build unsigned IPA` workflow runs XcodeGen + xcodebuild with signing
-   disabled and uploads `Rennli-unsigned.ipa` as a build artifact.
-3. Sign the IPA with your own certificate + provisioning profile (the profile's
-   bundle id must match `PRODUCT_BUNDLE_IDENTIFIER` in `project.yml`, and the
-   widget extension id must be `<bundle-id>.widgets`) and install it.
+## البنية
 
-## What this build can and cannot do
+- SwiftUI، الحد الأدنى **iOS 17**، توليد المشروع بـ XcodeGen من `project.yml` (البناء في GitHub Actions عبر `.github/workflows/rennli.yml` في المستودع المضيف، IPA غير موقّعة).
+- `App/ContentView.swift` — المحرك (استطلاع كل 3 ثوانٍ، Live Activity، الرنين) + الشاشات: تذكرتي (انتظار/جاهز)، طلباتي (متعددة المحلات، محفوظة محلياً)، التقييم، الإعدادات (نغمة 1/2، لغة عربية/فرنسية).
+- `App/Design.swift` — نظام التصميم (ألوان متكيفة فاتح/داكن، خط Cairo، HeroNumber).
+- `App/Strings.swift` — جدول عربي/فرنسي.
+- `Shared/TicketActivity.swift` — عقد الـ Live Activity بين التطبيق والإضافة.
+- `Widgets/RennliWidgets.swift` — Live Activity وDynamic Island بهوية الاتجاه 2.
+- الخادم: Worker الحالي `https://rennli.basatbelaifa7.workers.dev` (لا يُعاد بناؤه).
 
-- WORKS ad-hoc: install, ticket status, in-app ringing, Live Activity that
-  starts and updates while the app is used.
-- Needs a paid Apple Developer account later: App Clip from QR scan, APNs
-  remote updates to the Live Activity while the app is closed, App Store
-  distribution.
+## ما يعمل الآن (بلا حساب مطوّر)
 
-Bundle ids in `project.yml` are placeholders (`com.example.rennli`) — replace
-them with the ids tied to your signing certificate before building.
+- فتح التذكرة بلصق الرابط، متابعة الحالة لحظياً، رنين + اهتزاز داخل التطبيق عند «جاهز».
+- Live Activity على الشاشة المقفلة + Dynamic Island (مُختبَرة على جهاز حقيقي، النسخة 1، 5 نوفمبر 2026).
+- طلبات متعددة محفوظة، تقييم بالنجوم (يفتح رابط Google Reviews عندما يوفّره الخادم)، نغمتان، عربية/فرنسية.
+
+## مجهّز وينتظر حساب Apple Developer
+
+- **Universal Links:** ملف الارتباط منشور على `/.well-known/apple-app-site-association` (مسارات `/t/*`)، والتطبيق يلتقط الروابط (`onOpenURL` + `NSUserActivity`) — ينقص فقط معرّف الفريق الحقيقي في الملف وقدرة `associated-domains` في المشروع.
+- **APNs:** معرّف جهاز مجهول يُولّد عند أول تشغيل (`AppModel.deviceId()`) جاهز للتسجيل عند توفر مفتاح `.p8`؛ الإشعارات Time Sensitive تُفعّل مع الحساب.
+- **App Clip:** نفس الـQR والروابط — يُبنى من نفس المشروع عند توفر الحساب.
+
+## خطة الإصدار على App Store
+
+1. قبول تسجيل Apple Developer (قيد المراجعة منذ 5 نوفمبر 2026).
+2. استبدال `TEAMID` في ملف الارتباط + ضبط Bundle ID نهائي + شهادات التوزيع.
+3. تفعيل APNs (مفتاح .p8 في سرّيات الـWorker) + اختبار إشعار Time Sensitive على جهاز حقيقي.
+4. بناء TestFlight واختبار أسبوع في محل حقيقي واحد.
+5. تجهيز صفحة المتجر (لقطات من الاتجاه 2، وصف دارجة/فرنسية) وتقديم للمراجعة.
+
+## تقرير الاختبار على جهاز حقيقي
+
+- 5 نوفمبر 2026، النسخة 1 (قبل إعادة التصميم): التثبيت بشهادة إعادة بيع، فتح تذكرة 26 من رابط، قفل الشاشة، إطلاق «جاهز» من الخادم → بانر Live Activity ظهر على الشاشة المقفلة. ✅
+- النسخة 2 (الاتجاه 2): بانتظار تثبيت صاحب المشروع وتأكيده.
