@@ -1074,7 +1074,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "11.0")
+                    LabeledContent(s.version, value: "11.1")
                 }
             }
             .navigationTitle(s.settingsTitle)

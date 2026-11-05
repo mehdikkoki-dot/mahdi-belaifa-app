@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Shop ads (v10): animated carousel on the waiting screen
 
@@ -45,10 +46,30 @@ func adThemeColors(_ theme: String) -> [Color] {
     }
 }
 
+/// Loads ad images once and keeps the UIImages: the carousel frame is
+/// flexible — it takes each image's own aspect ratio (his rule: the whole
+/// frame must show, e.g. a 16:9 photo shows as a full 16:9 frame).
+@MainActor
+final class AdImageStore: ObservableObject {
+    @Published var images: [String: UIImage] = [:]
+
+    func load(_ ads: [AdItem]) async {
+        for ad in ads where ad.kind == "image" {
+            if images[ad.id] != nil { continue }
+            guard let u = ad.imageUrl, let url = URL(string: u) else { continue }
+            if let (data, _) = try? await URLSession.shared.data(from: url),
+               let img = UIImage(data: data) {
+                images[ad.id] = img
+            }
+        }
+    }
+}
+
 struct AdCarouselView: View {
     let ads: [AdItem]
     let s: Strings
     @State private var idx = 0
+    @StateObject private var store = AdImageStore()
     @State private var kb = false
     @State private var flow = false
     @Environment(\.openURL) private var openURL
@@ -65,7 +86,8 @@ struct AdCarouselView: View {
                         .allowsHitTesting(idx == i)
                 }
             }
-            .frame(height: 248)
+            .aspectRatio(currentAspect, contentMode: .fit)
+            .animation(.easeInOut(duration: 0.5), value: currentAspect)
             .clipShape(RoundedRectangle(cornerRadius: 24))
             .shadow(color: .black.opacity(0.16), radius: 20, y: 10)
             .contentShape(RoundedRectangle(cornerRadius: 24))
@@ -84,6 +106,9 @@ struct AdCarouselView: View {
                 }
             }
         }
+        .task(id: ads.map(\.id).joined(separator: ",")) {
+            await store.load(ads)
+        }
         .onAppear {
             if !reduceMotion {
                 withAnimation(.easeInOut(duration: 7).repeatForever(autoreverses: true)) { kb = true }
@@ -98,6 +123,16 @@ struct AdCarouselView: View {
                 withAnimation(.easeInOut(duration: 0.7)) { idx = (idx + 1) % ads.count }
             }
         }
+    }
+
+    private var currentAspect: CGFloat {
+        guard ads.indices.contains(idx) else { return 16.0 / 9.0 }
+        let ad = ads[idx]
+        if ad.kind == "image", let img = store.images[ad.id], img.size.height > 0 {
+            let a = img.size.width / img.size.height
+            return min(max(a, 0.85), 2.35)
+        }
+        return 16.0 / 9.0
     }
 
     @ViewBuilder
@@ -132,12 +167,15 @@ struct AdCarouselView: View {
             }
         } else {
             ZStack {
-                if let u = ad.imageUrl, let url = URL(string: u) {
-                    AsyncImage(url: url) { img in
-                        img.resizable().scaledToFill()
-                    } placeholder: { Color(hex: 0x2B1A12) }
-                    .scaleEffect(reduceMotion ? 1.0 : (kb ? 1.13 : 1.02))
-                    .offset(x: reduceMotion ? 0 : (kb ? -8 : 0), y: reduceMotion ? 0 : (kb ? -5 : 0))
+                if let img = store.images[ad.id] {
+                    Image(uiImage: img)
+                        .resizable().scaledToFill()
+                        .blur(radius: 18).opacity(0.85)
+                        .scaleEffect(reduceMotion ? 1.0 : (kb ? 1.12 : 1.03))
+                    Image(uiImage: img)
+                        .resizable().scaledToFit()
+                } else {
+                    Color(hex: 0x2B1A12)
                 }
                 LinearGradient(colors: [.clear, .clear, .black.opacity(0.86)],
                                startPoint: .top, endPoint: .bottom)
