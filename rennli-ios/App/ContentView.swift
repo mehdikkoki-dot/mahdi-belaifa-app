@@ -400,7 +400,7 @@ struct ConnectView: View {
                 Circle().fill(Theme.cardWhite).frame(width: 92, height: 92)
                     .shadow(color: .black.opacity(0.08), radius: 14, y: 6)
                 Image(systemName: "bell.fill").font(.system(size: 40)).foregroundStyle(Theme.orange)
-                    .symbolEffect(.wiggle, options: .nonRepeating, isActive: true)
+                    .symbolEffect(.pulse, options: .repeating, isActive: true)
             }
             Text(s.appName).font(.cairo(34, .black)).foregroundStyle(Theme.ink)
             Text(s.connectHint)
