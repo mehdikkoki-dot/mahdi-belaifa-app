@@ -28,8 +28,8 @@ struct TicketLiveActivity: Widget {
             }
             .padding(16)
             .activityBackgroundTint(context.state.status == "ready"
-                ? Color(red: 0.85, green: 0.33, blue: 0.02)
-                : Color(red: 0.11, green: 0.07, blue: 0.05))
+                ? Color(red: 0.957, green: 0.318, blue: 0.043)
+                : Color(red: 0.090, green: 0.066, blue: 0.043))
             .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
             DynamicIsland {

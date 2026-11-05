@@ -42,8 +42,8 @@ struct Strings {
         }
     }
     var waitingLine: String { t("طلبك يتحضّر", "Votre commande se prépare") }
-    var waitingSub: String { t("خلي الشاشة مفتوحة — يرنّ هاتفك كي يجهز",
-                               "Gardez l'écran ouvert — votre téléphone sonnera quand ce sera prêt") }
+    var waitingSub: String { t("اقعد مرتاح — جوالك يرن أول ما يجهز طلبك",
+                               "Installez-vous — votre téléphone sonnera dès que c'est prêt") }
     var stepReceived: String { t("استلمنا طلبك", "Commande reçue") }
     var stepCooking: String { t("يتحضّر دروك", "En préparation") }
     var stepReady: String { t("جاهز للاستلام", "Prêt à récupérer") }
@@ -71,6 +71,14 @@ struct Strings {
     var device: String { t("معرّف الجهاز", "Identifiant de l'appareil") }
     var version: String { t("النسخة", "Version") }
 
+    var live: String { t("مباشر", "En direct") }
+    var alertOn: String { t("التنبيه شغال — يرن جوالك حتى لو قفلت الشاشة",
+                            "Alerte active — votre téléphone sonne même écran verrouillé") }
+    var tagline1: String { t("بلا تطبيق، بلا حساب، بلا رقم هاتف", "Sans application, sans compte, sans numéro") }
+    var tagline2: String { t("امسح الكود وخلاص", "Scannez le code, c'est tout") }
+    var ringNow: String { t("جوالك يرن دروك", "Votre téléphone sonne") }
+    var ringNowSub: String { t("رنة قوية كيف البيجر — حتى تضغط «جاي»",
+                               "Une sonnerie forte, comme un bipeur — jusqu'à votre arrivée") }
     var newTicket: String { t("تذكرة جديدة", "Nouveau ticket") }
     var scanButton: String { t("امسح كود الطلب", "Scanner le code") }
     var orPaste: String { t("ولا الصق الرابط", "ou collez le lien") }

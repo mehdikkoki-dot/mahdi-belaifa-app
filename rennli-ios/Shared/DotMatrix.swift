@@ -5,10 +5,12 @@ import SwiftUI
 public struct DotMatrixNumber: View {
     let text: String
     var color: Color = .white
+    var accent: Color? = nil
 
-    public init(text: String, color: Color = .white) {
+    public init(text: String, color: Color = .white, accent: Color? = nil) {
         self.text = text
         self.color = color
+        self.accent = accent
     }
 
     private static let glyphs: [Character: [[Bool]]] = {
@@ -41,8 +43,10 @@ public struct DotMatrixNumber: View {
                         let cx = CGFloat(ci * 6 + col) * cell + cell / 2
                         let cy = CGFloat(row) * cell + cell / 2
                         let rect = CGRect(x: cx - r, y: cy - r, width: r * 2, height: r * 2)
+                        let on = g[row][col]
+                        let dotColor = (on && ci == chars.count - 1) ? (accent ?? color) : color
                         ctx.fill(Path(ellipseIn: rect),
-                                 with: .color(color.opacity(g[row][col] ? 1.0 : 0.13)))
+                                 with: .color(dotColor.opacity(on ? 1.0 : 0.13)))
                     }
                 }
             }

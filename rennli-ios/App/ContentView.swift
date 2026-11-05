@@ -298,6 +298,7 @@ struct ContentView: View {
                 .tag(2)
         }
         .tint(Theme.orange)
+        .preferredColorScheme(.dark)
         .environment(\.layoutDirection, s.isRTL ? .rightToLeft : .leftToRight)
         .onOpenURL { url in
             app.open(rawInput: url.absoluteString)
@@ -348,9 +349,9 @@ struct ConnectView: View {
                 Circle().fill(Theme.orangeSoft).frame(width: 92, height: 92)
                 Image(systemName: "bell.fill").font(.system(size: 40)).foregroundStyle(Theme.orange)
             }
-            Text(s.appName).font(.cairo(34, .black)).foregroundStyle(Theme.ink)
+            Text(s.appName).font(.cairo(34, .black)).foregroundStyle(Theme.cream)
             Text(s.connectHint)
-                .font(.cairo(15)).foregroundStyle(Theme.muted)
+                .font(.cairo(15)).foregroundStyle(Theme.mutedScene)
                 .multilineTextAlignment(.center)
             Button {
                 showScanner = true
@@ -363,7 +364,7 @@ struct ConnectView: View {
             .sheet(isPresented: $showScanner) {
                 ScannerSheet { code in app.open(rawInput: code) }
             }
-            Text(s.orPaste).font(.cairo(13, .bold)).foregroundStyle(Theme.muted)
+            Text(s.orPaste).font(.cairo(13, .bold)).foregroundStyle(Theme.mutedScene)
             TextField(s.linkPlaceholder, text: $input)
                 .textFieldStyle(.roundedBorder)
                 .font(.cairo(15))
@@ -387,8 +388,8 @@ struct ShopHeader: View {
     var body: some View {
         HStack(spacing: 10) {
             ZStack {
-                RoundedRectangle(cornerRadius: 12).fill(Theme.orangeSoft).frame(width: 38, height: 38)
-                Image(systemName: "bell.fill").font(.system(size: 17)).foregroundStyle(Theme.orange)
+                RoundedRectangle(cornerRadius: 12).fill(Theme.ink).frame(width: 38, height: 38)
+                Image(systemName: "bell.fill").font(.system(size: 17)).foregroundStyle(Theme.gold)
             }
             VStack(alignment: .leading, spacing: 0) {
                 Text(shop).font(.cairo(16, .bold)).foregroundStyle(Theme.ink)
@@ -396,10 +397,9 @@ struct ShopHeader: View {
             Spacer()
             if let chip {
                 Text(chip)
-                    .font(.cairo(12.5, .bold)).foregroundStyle(Theme.orangeDeep)
+                    .font(.cairo(12.5, .black)).foregroundStyle(Theme.gold)
                     .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(Theme.orangeSoft)
-                    .overlay(Capsule().stroke(Theme.orange, lineWidth: 1.5))
+                    .background(Theme.ink)
                     .clipShape(Capsule())
             }
         }
@@ -411,55 +411,64 @@ struct WaitingView: View {
     let s: Strings
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
-                       chip: s.statusShort(model.status))
+        VStack(spacing: 0) {
+            TicketCard {
+                VStack(spacing: 0) {
+                    ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
+                               chip: s.live)
+                    Text(s.orderNumber)
+                        .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 20)
+                    DotMatrixNumber(text: model.number, color: Theme.ink, accent: Theme.orange)
+                        .frame(height: 84)
+                        .padding(.top, 8)
+                    Text(s.waitingLine)
+                        .font(.cairo(19, .black)).foregroundStyle(Theme.ink)
+                        .padding(.top, 12)
+                    Text(s.waitingSub)
+                        .font(.cairo(13.5)).foregroundStyle(Theme.tan)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 3)
+                    if let eta = model.etaMinutes, eta > 0 {
+                        Text(s.etaText(eta))
+                            .font(.cairo(13, .black)).foregroundStyle(Theme.gold)
+                            .padding(.horizontal, 14).padding(.vertical, 7)
+                            .background(Theme.ink)
+                            .clipShape(Capsule())
+                            .padding(.top, 12)
+                    }
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(Theme.greenInk)
+                        Text(s.alertOn)
+                            .font(.cairo(13, .bold)).foregroundStyle(Theme.greenInk)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(11)
+                    .background(Theme.greenBg)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .padding(.top, 16)
+                }
+            }
+            .padding(.top, 26)
+            VenueLinks(model: model, s: s)
+                .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.top, 18)
-            Text(s.orderNumber)
-                .font(.cairo(14, .bold)).foregroundStyle(Theme.muted)
-                .padding(.top, 42)
-            HeroNumber(number: model.number)
-            Text(s.waitingLine).font(.cairo(19, .bold)).foregroundStyle(Theme.ink).padding(.top, 8)
-            if let eta = model.etaMinutes, eta > 0 {
-                Label(s.etaText(eta), systemImage: "clock")
-                    .font(.cairo(14, .bold)).foregroundStyle(Theme.orangeDeep)
-                    .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(Theme.orangeSoft).clipShape(Capsule())
-                    .padding(.top, 8)
-            }
-            Text(s.waitingSub).font(.cairo(14)).foregroundStyle(Theme.muted).padding(.top, 4)
-            VenueLinks(model: model, s: s).padding(.top, 16)
             Spacer()
-            VStack(spacing: 0) {
-                stepRow(done: true, current: false, label: s.stepReceived, symbol: "✓")
-                stepRow(done: false, current: true, label: s.stepCooking, symbol: "◐")
-                stepRow(done: false, current: false, label: s.stepReady, symbol: "3")
+            VStack(spacing: 3) {
+                Text(s.tagline1)
+                    .font(.cairo(13.5, .bold)).foregroundStyle(Theme.mutedScene)
+                Text(s.tagline2)
+                    .font(.cairo(15, .black)).foregroundStyle(Theme.cream)
             }
+            .multilineTextAlignment(.center)
             if !model.error.isEmpty {
                 Text(model.error).font(.cairo(13)).foregroundStyle(.red).padding(.top, 10)
             }
         }
-        .padding(.horizontal, 26)
+        .padding(.horizontal, 22)
         .padding(.bottom, 22)
-    }
-
-    private func stepRow(done: Bool, current: Bool, label: String, symbol: String) -> some View {
-        HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(done ? Theme.ink : (current ? Theme.orange : Theme.sand))
-                    .frame(width: 27, height: 27)
-                Text(symbol)
-                    .font(.cairo(13, .bold))
-                    .foregroundStyle(done || current ? .white : Theme.muted)
-            }
-            Text(label)
-                .font(.cairo(15, .bold))
-                .foregroundStyle(done ? Theme.ink : (current ? Theme.orangeDeep : Theme.muted))
-            Spacer()
-        }
-        .padding(.vertical, 11)
-        .accessibilityElement(children: .combine)
     }
 }
 
@@ -483,32 +492,46 @@ struct ReadyView: View {
                         .delay(Double(i) * 0.8), value: pulse)
             }
             VStack(spacing: 0) {
-                HStack {
-                    Text(model.shopName.isEmpty ? s.shopFallback : model.shopName)
-                        .font(.cairo(16, .bold)).foregroundStyle(.white)
-                    Spacer()
+                Text(s.ringNow)
+                    .font(.cairo(21, .black)).foregroundStyle(.white)
+                    .padding(.top, 28)
+                Text(s.ringNowSub)
+                    .font(.cairo(13.5, .bold)).foregroundStyle(.white.opacity(0.85))
+                    .padding(.top, 3)
+                TicketCard {
+                    VStack(spacing: 0) {
+                        Text(model.shopName.isEmpty ? s.shopFallback : model.shopName)
+                            .font(.cairo(15, .black)).foregroundStyle(Theme.ink)
+                        Text(s.orderNumber)
+                            .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
+                            .padding(.top, 14)
+                        DotMatrixNumber(text: model.number, color: Theme.orangeDeep, accent: Theme.orangeDeep)
+                            .frame(height: 84)
+                            .padding(.top, 8)
+                        Text(s.readyTitle)
+                            .font(.cairo(24, .black)).foregroundStyle(Theme.orangeDeep)
+                            .padding(.top, 12)
+                        Text(s.readySub)
+                            .font(.cairo(14, .bold)).foregroundStyle(Theme.tan)
+                            .padding(.top, 3)
+                    }
                 }
-                .padding(.top, 18)
-                Text(s.orderNumber)
-                    .font(.cairo(14, .bold)).foregroundStyle(.white.opacity(0.9))
-                    .padding(.top, 52)
-                HeroNumber(number: model.number, onOrange: true, size: 180)
-                Text(s.readyTitle).font(.cairo(27, .black)).foregroundStyle(.white)
-                Text(s.readySub).font(.cairo(15, .bold)).foregroundStyle(.white.opacity(0.9)).padding(.top, 4)
+                .padding(.top, 24)
                 Spacer()
                 if !model.acked {
                     Button(s.ackButton) { model.ack() }
-                        .font(.cairo(18, .black)).foregroundStyle(Theme.orangeSoft)
+                        .font(.cairo(18, .black)).foregroundStyle(Theme.orangeDeep)
                         .frame(maxWidth: .infinity).padding(.vertical, 19)
-                        .background(Theme.ink)
+                        .background(Theme.paperTop)
                         .clipShape(RoundedRectangle(cornerRadius: 999))
+                        .shadow(color: .black.opacity(0.3), radius: 16, y: 8)
                 } else {
                     Text(s.ackDone)
                         .font(.cairo(16, .bold)).foregroundStyle(.white)
                         .padding(.vertical, 19)
                 }
             }
-            .padding(.horizontal, 26)
+            .padding(.horizontal, 22)
             .padding(.bottom, 22)
         }
         .onAppear { pulse = true }
@@ -538,13 +561,12 @@ struct VenueLinks: View {
                     } label: {
                         Label(link.0, systemImage: link.1)
                             .font(.cairo(13.5, .bold))
-                            .padding(.horizontal, 12).padding(.vertical, 8)
-                            .background(Theme.sand.opacity(0.55))
+                            .padding(.horizontal, 14).padding(.vertical, 9)
+                            .background(Theme.paperTop)
                             .foregroundStyle(Theme.ink)
                             .clipShape(Capsule())
                     }
                 }
-                Spacer()
             }
         }
     }
@@ -557,35 +579,42 @@ struct CompletedView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
-                       chip: s.statusShort(model.status))
-                .padding(.top, 18)
-            Spacer()
-            ZStack {
-                Circle().fill(Theme.orangeSoft).frame(width: 110, height: 110)
-                Image(systemName: "checkmark")
-                    .font(.system(size: 52, weight: .black))
-                    .foregroundStyle(Theme.orange)
+            TicketCard {
+                VStack(spacing: 0) {
+                    ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
+                               chip: s.statusShort(model.status))
+                    ZStack {
+                        Circle().fill(Theme.greenBg).frame(width: 96, height: 96)
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 44, weight: .black))
+                            .foregroundStyle(Theme.greenInk)
+                    }
+                    .padding(.top, 22)
+                    Text(s.statusText(model.status))
+                        .font(.cairo(21, .black)).foregroundStyle(Theme.ink)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 14)
+                    Text(s.orderNumber)
+                        .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
+                        .padding(.top, 14)
+                    DotMatrixNumber(text: model.number, color: Theme.ink, accent: Theme.orange)
+                        .frame(height: 48)
+                        .padding(.top, 6)
+                }
             }
-            Text(s.statusText(model.status))
-                .font(.cairo(24, .black)).foregroundStyle(Theme.ink)
-                .padding(.top, 20)
-            Text(s.orderNumber)
-                .font(.cairo(14, .bold)).foregroundStyle(Theme.muted)
-                .padding(.top, 14)
-            HeroNumber(number: model.number, size: 84)
-            Spacer()
+            .padding(.top, 26)
             if model.status == "completed" {
-                RatingCard(model: model, s: s)
+                RatingCard(model: model, s: s).padding(.top, 18)
             }
+            Spacer()
             Button(s.newTicket) {
                 Haptics.tap()
                 app.closeCurrent()
             }
-            .font(.cairo(17, .bold)).foregroundStyle(Theme.orangeDeep)
+            .font(.cairo(17, .black)).foregroundStyle(Theme.orange)
             .padding(.top, 18)
         }
-        .padding(.horizontal, 26)
+        .padding(.horizontal, 22)
         .padding(.bottom, 22)
     }
 }
@@ -600,9 +629,9 @@ struct RatingCard: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            Text(s.rateTitle).font(.cairo(16, .black)).foregroundStyle(.white)
+            Text(s.rateTitle).font(.cairo(16, .black)).foregroundStyle(Theme.ink)
             Text(rating == 0 ? s.rateAsk : s.rateThanks)
-                .font(.cairo(13, .bold)).foregroundStyle(Theme.muted)
+                .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
             HStack(spacing: 8) {
                 ForEach(1...5, id: \.self) { i in
                     Button {
@@ -613,7 +642,7 @@ struct RatingCard: View {
                     } label: {
                         Image(systemName: i <= rating ? "star.fill" : "star")
                             .font(.system(size: 22))
-                            .foregroundStyle(Theme.gold)
+                            .foregroundStyle(Theme.goldDeep)
                     }
                     .accessibilityLabel("\(i)")
                 }
@@ -622,8 +651,9 @@ struct RatingCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(18)
-        .background(Color(red: 0.169, green: 0.102, blue: 0.071))
+        .background(Theme.paperGradient)
         .clipShape(RoundedRectangle(cornerRadius: 24))
+        .shadow(color: .black.opacity(0.35), radius: 18, y: 10)
     }
 }
 
@@ -638,7 +668,7 @@ struct OrdersView: View {
         NavigationStack {
             List {
                 if app.tickets.isEmpty {
-                    Text(s.ordersEmpty).font(.cairo(15)).foregroundStyle(Theme.muted)
+                    Text(s.ordersEmpty).font(.cairo(15)).foregroundStyle(Theme.mutedScene)
                 }
                 ForEach(app.tickets) { t in
                     Button {
@@ -646,11 +676,11 @@ struct OrdersView: View {
                         onPick()
                     } label: {
                         HStack(spacing: 14) {
-                            HeroNumber(number: t.number, size: 40)
-                                .frame(minWidth: 78, alignment: .leading)
+                            DotMatrixNumber(text: t.number, color: Theme.cream, accent: Theme.orange)
+                                .frame(width: 84, height: 30)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(t.shop).font(.cairo(15.5, .bold)).foregroundStyle(Theme.ink)
-                                Text(timeAgo(t.addedAt)).font(.cairo(12.5)).foregroundStyle(Theme.muted)
+                                Text(t.shop).font(.cairo(15.5, .bold)).foregroundStyle(Theme.cream)
+                                Text(timeAgo(t.addedAt)).font(.cairo(12.5)).foregroundStyle(Theme.mutedScene)
                             }
                             Spacer()
                             StatusPill(status: t.status, s: s)
@@ -703,7 +733,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "2.0")
+                    LabeledContent(s.version, value: "4.0")
                 }
             }
             .navigationTitle(s.settingsTitle)

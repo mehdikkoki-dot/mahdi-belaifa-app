@@ -1,39 +1,43 @@
 import SwiftUI
 import UIKit
 
-/// Direction 2 — «دفء النهار» design system: warm café daylight.
-/// Cream paper, bold orange, espresso ink. Cairo is the voice.
+/// Direction «بطاقة البيجر LED» — the chosen design (board 5).
+/// A warm paper ticket floating on a dark espresso scene; the order number
+/// is an LED dot-matrix display. The scene is always dark — the ticket is
+/// the light.
 enum Theme {
-    static func dyn(light: UIColor, dark: UIColor) -> Color {
-        Color(UIColor { traits in traits.userInterfaceStyle == .dark ? dark : light })
+    static let scene = Color(red: 0.090, green: 0.066, blue: 0.043)       // #17110B
+    static let sceneCard = Color(red: 0.141, green: 0.102, blue: 0.063)   // #241A10
+    static let sceneLine = Color(red: 0.227, green: 0.173, blue: 0.110)   // #3A2C1C
+    static let cream = Color(red: 1.00, green: 0.969, blue: 0.929)        // #FFF7ED
+    static let mutedScene = Color(red: 0.722, green: 0.647, blue: 0.549)  // #B8A58C
+
+    static let paperTop = Color(red: 1.00, green: 0.976, blue: 0.933)      // #FFF9EE
+    static let paperBottom = Color(red: 1.00, green: 0.937, blue: 0.847)  // #FFEFD8
+    static let ink = Color(red: 0.169, green: 0.102, blue: 0.071)         // #2B1A12
+    static let tan = Color(red: 0.663, green: 0.561, blue: 0.463)         // #A98F76
+
+    static let orange = Color(red: 0.957, green: 0.318, blue: 0.043)      // #F4510B
+    static let orangeBright = Color(red: 1.00, green: 0.471, blue: 0.278) // #FF7847
+    static let orangeDeep = Color(red: 0.839, green: 0.239, blue: 0.008)  // #D63D02
+    static let gold = Color(red: 1.00, green: 0.725, blue: 0.125)         // #FFB020
+    static let goldDeep = Color(red: 0.80, green: 0.52, blue: 0.05)
+    static let greenBg = Color(red: 0.914, green: 0.976, blue: 0.941)     // #E9F9F0
+    static let greenInk = Color(red: 0.055, green: 0.420, blue: 0.263)    // #0E6B43
+
+    static var paperGradient: LinearGradient {
+        LinearGradient(colors: [paperTop, paperBottom], startPoint: .top, endPoint: .bottom)
     }
-
-    /// Warm cream paper (app background, light) / deep espresso (dark)
-    static var paper: Color { dyn(light: UIColor(red: 1.00, green: 0.976, blue: 0.941, alpha: 1),
-                                  dark: UIColor(red: 0.114, green: 0.075, blue: 0.047, alpha: 1)) }
-    /// Card surface
-    static var card: Color { dyn(light: .white,
-                                 dark: UIColor(red: 0.165, green: 0.106, blue: 0.067, alpha: 1)) }
-    /// Espresso ink
-    static var ink: Color { dyn(light: UIColor(red: 0.169, green: 0.102, blue: 0.071, alpha: 1),
-                                dark: UIColor(red: 1.00, green: 0.957, blue: 0.902, alpha: 1)) }
-    /// Warm muted text
-    static var muted: Color { dyn(light: UIColor(red: 0.663, green: 0.561, blue: 0.463, alpha: 1),
-                                  dark: UIColor(red: 0.769, green: 0.647, blue: 0.510, alpha: 1)) }
-    /// Hairline / soft fill
-    static var sand: Color { dyn(light: UIColor(red: 0.945, green: 0.890, blue: 0.753, alpha: 1),
-                                 dark: UIColor(red: 0.29, green: 0.20, blue: 0.13, alpha: 1)) }
-
-    static let orange = Color(red: 0.969, green: 0.404, blue: 0.027)      // #F76707
-    static let orangeDeep = Color(red: 0.910, green: 0.349, blue: 0.047)  // #E8590C
-    static let orangeSoft = Color(red: 1.00, green: 0.957, blue: 0.902)   // #FFF4E6
-    static let gold = Color(red: 1.00, green: 0.788, blue: 0.302)         // #FFC94D
-
     static var readyGradient: LinearGradient {
-        LinearGradient(colors: [Color(red: 1.00, green: 0.663, blue: 0.302),
-                                orange, orangeDeep],
-                       startPoint: .top, endPoint: .bottom)
+        LinearGradient(colors: [orangeBright, orange, orangeDeep], startPoint: .top, endPoint: .bottom)
     }
+
+    // Legacy aliases (scene surfaces)
+    static var paper: Color { scene }
+    static var card: Color { sceneCard }
+    static var muted: Color { tan }
+    static var sand: Color { sceneLine }
+    static var orangeSoft: Color { paperTop }
 }
 
 extension Font {
@@ -49,8 +53,58 @@ extension Font {
     }
 }
 
-/// The hero order number: every digit in ink except the last one in orange
-/// (on the ready screen: all white).
+/// Ticket outline: rounded card whose bottom edge is punched with
+/// semicircular scallops — a torn receipt.
+struct TicketShape: Shape {
+    var radius: CGFloat = 26
+    var notch: CGFloat = 9
+
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let r = radius
+        p.move(to: CGPoint(x: rect.minX + r, y: rect.minY))
+        p.addLine(to: CGPoint(x: rect.maxX - r, y: rect.minY))
+        p.addArc(center: CGPoint(x: rect.maxX - r, y: rect.minY + r), radius: r,
+                 startAngle: .degrees(-90), endAngle: .degrees(0), clockwise: true)
+        p.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - r))
+        p.addArc(center: CGPoint(x: rect.maxX - r, y: rect.maxY - r), radius: r,
+                 startAngle: .degrees(0), endAngle: .degrees(90), clockwise: true)
+        let startX = rect.maxX - r
+        let endX = rect.minX + r
+        let span = startX - endX
+        let count = max(1, Int(span / (notch * 2)))
+        let step = span / CGFloat(count)
+        var x = startX
+        for _ in 0..<count {
+            p.addArc(center: CGPoint(x: x - step / 2, y: rect.maxY), radius: step / 2,
+                     startAngle: .degrees(0), endAngle: .degrees(180), clockwise: false)
+            x -= step
+        }
+        p.addArc(center: CGPoint(x: rect.minX + r, y: rect.maxY - r), radius: r,
+                 startAngle: .degrees(90), endAngle: .degrees(180), clockwise: true)
+        p.addLine(to: CGPoint(x: rect.minX, y: rect.minY + r))
+        p.addArc(center: CGPoint(x: rect.minX + r, y: rect.minY + r), radius: r,
+                 startAngle: .degrees(180), endAngle: .degrees(270), clockwise: true)
+        p.closeSubpath()
+        return p
+    }
+}
+
+/// The paper ticket itself: gradient fill, punched bottom, soft shadow.
+struct TicketCard<Content: View>: View {
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        content
+            .padding(20)
+            .padding(.bottom, 8)
+            .background(TicketShape().fill(Theme.paperGradient))
+            .shadow(color: .black.opacity(0.45), radius: 24, y: 14)
+    }
+}
+
+/// The hero order number as text (lists / fallback): last digit in orange.
+/// Digits are forced LTR so 57 never renders as 75 in the RTL layout.
 struct HeroNumber: View {
     let number: String
     var onOrange: Bool = false
@@ -65,12 +119,13 @@ struct HeroNumber: View {
                     .foregroundStyle(color(for: idx, count: chars.count))
             }
         }
+        .environment(\.layoutDirection, .leftToRight)
         .accessibilityLabel("رقم الطلب \(number)")
     }
 
     private func color(for idx: Int, count: Int) -> Color {
         if onOrange { return .white }
-        return idx == count - 1 ? Theme.orange : Theme.ink
+        return idx == count - 1 ? Theme.orange : Theme.cream
     }
 }
 
@@ -83,8 +138,8 @@ struct StatusPill: View {
         Text(s.statusShort(status))
             .font(.cairo(12, .black))
             .padding(.horizontal, 11).padding(.vertical, 6)
-            .background(status == "ready" ? Theme.orange : Theme.orangeSoft)
-            .foregroundStyle(status == "ready" ? .white : Theme.orangeDeep)
+            .background(status == "ready" ? Theme.orange : Color.white.opacity(0.08))
+            .foregroundStyle(status == "ready" ? .white : Theme.gold)
             .clipShape(Capsule())
     }
 }
