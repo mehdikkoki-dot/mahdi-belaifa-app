@@ -619,7 +619,13 @@ struct WaitingView: View {
             .padding(.top, 16)
             .padding(.bottom, 20)
         }
-        .task { await adsModel.load(ticketId: model.ticketId) }
+        .task(id: model.ticketId) {
+            await adsModel.load(ticketId: model.ticketId)
+            if adsModel.ads.isEmpty {
+                try? await Task.sleep(nanoseconds: 2_500_000_000)
+                await adsModel.load(ticketId: model.ticketId)
+            }
+        }
     }
 }
 
