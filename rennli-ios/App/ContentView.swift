@@ -1,5 +1,6 @@
 import ActivityKit
 import PhotosUI
+import Vision
 import AudioToolbox
 import AVFoundation
 import SwiftUI
@@ -347,9 +348,31 @@ struct ConnectView: View {
     @State private var galleryError: String = ""
 
     /// Temporary bridge (his request): read a ticket QR from a saved photo.
+    /// Vision first (strong on photos of screens), CIDetector as fallback.
     static func decodeQR(from data: Data) -> String? {
-        guard let image = UIImage(data: data),
-              let ci = CIImage(image: image) else { return nil }
+        guard let image = UIImage(data: data) else { return nil }
+        if let cg = image.cgImage {
+            let request = VNDetectBarcodesRequest()
+            request.symbologies = [.qr]
+            let orientation: CGImagePropertyOrientation
+            switch image.imageOrientation {
+            case .up: orientation = .up
+            case .down: orientation = .down
+            case .left: orientation = .left
+            case .right: orientation = .right
+            case .upMirrored: orientation = .upMirrored
+            case .downMirrored: orientation = .downMirrored
+            case .leftMirrored: orientation = .leftMirrored
+            case .rightMirrored: orientation = .rightMirrored
+            @unknown default: orientation = .up
+            }
+            let handler = VNImageRequestHandler(cgImage: cg, orientation: orientation, options: [:])
+            if (try? handler.perform([request])) != nil,
+               let payload = request.results?.first?.payloadStringValue {
+                return payload
+            }
+        }
+        guard let ci = CIImage(image: image) else { return nil }
         let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil,
                                   options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
         let features = detector?.features(in: ci) as? [CIQRCodeFeature]
@@ -917,7 +940,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "6.1")
+                    LabeledContent(s.version, value: "6.2")
                 }
             }
             .navigationTitle(s.settingsTitle)
