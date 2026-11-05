@@ -619,7 +619,7 @@ struct WaitingView: View {
             .padding(.top, 16)
             .padding(.bottom, 20)
         }
-        .task { await adsModel.load() }
+        .task { await adsModel.load(ticketId: model.ticketId) }
     }
 }
 
@@ -1074,7 +1074,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "11.2")
+                    LabeledContent(s.version, value: "11.3")
                 }
             }
             .navigationTitle(s.settingsTitle)

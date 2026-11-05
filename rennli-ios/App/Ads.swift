@@ -20,8 +20,8 @@ private struct AdsResponse: Decodable { let ads: [AdItem] }
 final class AdsModel: ObservableObject {
     @Published var ads: [AdItem] = []
 
-    func load() async {
-        guard let url = URL(string: "https://rennli.basatbelaifa7.workers.dev/api/ads") else { return }
+    func load(ticketId: String) async {
+        guard let url = URL(string: "https://rennli.basatbelaifa7.workers.dev/api/ads?ticket=" + ticketId) else { return }
         if let (data, _) = try? await URLSession.shared.data(from: url),
            let decoded = try? JSONDecoder().decode(AdsResponse.self, from: data) {
             ads = decoded.ads
