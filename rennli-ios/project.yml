@@ -1,7 +1,7 @@
 name: Rennli
-postGenCommand: "sed -i '' 's/objectVersion = 77;/objectVersion = 60;/' Rennli.xcodeproj/project.pbxproj"
 options:
   bundleIdPrefix: com.example
+  projectFormat: xcode15_3
   deploymentTarget:
     iOS: "16.1"
 settings:
