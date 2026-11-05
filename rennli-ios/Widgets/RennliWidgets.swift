@@ -20,7 +20,7 @@ struct TicketLiveActivity: Widget {
                         .foregroundStyle(.secondary)
                     Text(context.state.statusText)
                         .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(context.state.status == "ready" ? .green : .primary)
+                        .foregroundStyle(context.state.status == "ready" ? .white : .primary)
                 }
                 Spacer()
                 Text(context.attributes.number)
@@ -28,8 +28,8 @@ struct TicketLiveActivity: Widget {
             }
             .padding(16)
             .activityBackgroundTint(context.state.status == "ready"
-                ? Color(red: 0.05, green: 0.35, blue: 0.20)
-                : Color(red: 0.08, green: 0.09, blue: 0.08))
+                ? Color(red: 0.85, green: 0.33, blue: 0.02)
+                : Color(red: 0.11, green: 0.07, blue: 0.05))
             .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
             DynamicIsland {
@@ -44,14 +44,14 @@ struct TicketLiveActivity: Widget {
                 DynamicIslandExpandedRegion(.bottom) {
                     Text(context.state.statusText)
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(context.state.status == "ready" ? .green : .primary)
+                        .foregroundStyle(context.state.status == "ready" ? Color(red: 0.97, green: 0.40, blue: 0.03) : .primary)
                 }
             } compactLeading: {
                 Text("رنّلي").font(.system(size: 12, weight: .bold))
             } compactTrailing: {
                 Text(context.attributes.number)
                     .font(.system(size: 14, weight: .black))
-                    .foregroundStyle(context.state.status == "ready" ? .green : .primary)
+                    .foregroundStyle(context.state.status == "ready" ? Color(red: 0.97, green: 0.40, blue: 0.03) : .primary)
             } minimal: {
                 Text(context.attributes.number)
                     .font(.system(size: 12, weight: .black))
