@@ -268,3 +268,127 @@ struct PulsingDot: View {
 extension View {
     func entrance(_ delay: Double = 0) -> some View { modifier(Entrance(delay: delay)) }
 }
+
+
+// MARK: - Masterpiece kit (v8)
+
+/// A slow light sweep across a surface — polished glass, not glitter.
+struct ShineSweep: ViewModifier {
+    let radius: CGFloat
+    @State private var x: CGFloat = -1.4
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(
+                GeometryReader { geo in
+                    Rectangle()
+                        .fill(LinearGradient(colors: [.clear, .white.opacity(0.15), .clear],
+                                             startPoint: .leading, endPoint: .trailing))
+                        .frame(width: geo.size.width * 0.45)
+                        .rotationEffect(.degrees(-16))
+                        .offset(x: x * geo.size.width * 1.5)
+                        .blur(radius: 6)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: radius))
+                .allowsHitTesting(false)
+            )
+            .task {
+                guard !reduceMotion else { return }
+                while !Task.isCancelled {
+                    try? await Task.sleep(nanoseconds: 2_400_000_000)
+                    withAnimation(.easeInOut(duration: 1.05)) { x = 1.4 }
+                    try? await Task.sleep(nanoseconds: 1_150_000_000)
+                    var tx = Transaction()
+                    tx.disablesAnimations = true
+                    withTransaction(tx) { x = -1.4 }
+                }
+            }
+    }
+}
+
+/// Expanding signal rings around the bell — the pager is listening.
+struct SignalWaves<Content: View>: View {
+    @ViewBuilder var content: () -> Content
+    @State private var t: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private let ink = Color(red: 0.13, green: 0.66, blue: 0.33)
+
+    var body: some View {
+        ZStack {
+            if !reduceMotion {
+                ForEach(0..<3, id: \.self) { i in
+                    let f = (t + Double(i) / 3.0).truncatingRemainder(dividingBy: 1.0)
+                    Circle()
+                        .stroke(ink.opacity(0.55 * (1 - f)), lineWidth: 1.6)
+                        .scaleEffect(0.45 + 0.95 * f)
+                }
+            }
+            content()
+        }
+        .frame(width: 46, height: 46)
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.linear(duration: 2.6).repeatForever(autoreverses: false)) { t = 1 }
+        }
+    }
+}
+
+/// One-shot burst of brand dots — the «بالعافية» celebration.
+struct DotBurst: View {
+    @State private var go = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private let palette: [Color] = [Theme.orange, Theme.gold, .white, Theme.orangeBright]
+
+    var body: some View {
+        ZStack {
+            ForEach(0..<16, id: \.self) { i in
+                let angle = Double(i) / 16.0 * 2 * Double.pi + Double(i % 3) * 0.22
+                let dist = 92.0 + Double((i * 37) % 55)
+                Circle()
+                    .fill(palette[i % palette.count])
+                    .frame(width: i % 3 == 0 ? 9 : 6, height: i % 3 == 0 ? 9 : 6)
+                    .offset(x: go ? cos(angle) * dist : 0,
+                            y: go ? sin(angle) * dist - 22 : 0)
+                    .opacity(go ? 0 : 0.95)
+                    .animation(.spring(response: 0.95, dampingFraction: 0.68).delay(Double(i) * 0.014), value: go)
+            }
+        }
+        .allowsHitTesting(false)
+        .onAppear {
+            guard !reduceMotion else { return }
+            go = true
+        }
+    }
+}
+
+/// Living background: two warm glows drifting very slowly under the UI.
+struct AmbientBackground: View {
+    @State private var drift = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        ZStack {
+            Theme.canvas
+            Circle()
+                .fill(Theme.orange.opacity(0.10))
+                .frame(width: 300, height: 300)
+                .blur(radius: 80)
+                .offset(x: drift ? -70 : -120, y: drift ? -250 : -290)
+            Circle()
+                .fill(Theme.gold.opacity(0.09))
+                .frame(width: 260, height: 260)
+                .blur(radius: 80)
+                .offset(x: drift ? 130 : 90, y: drift ? 300 : 340)
+        }
+        .ignoresSafeArea()
+        .onAppear {
+            guard !reduceMotion else { return }
+            withAnimation(.easeInOut(duration: 11).repeatForever(autoreverses: true)) { drift = true }
+        }
+    }
+}
+
+extension View {
+    func shineSweep(radius: CGFloat) -> some View { modifier(ShineSweep(radius: radius)) }
+}

@@ -7,14 +7,19 @@ public struct DotMatrixNumber: View {
     var color: Color = .white
     var accent: Color? = nil
     var offOpacity: Double = 0.13
+    /// Marquee chase: a light wave sweeps the dots (ready state).
+    var chase: Bool = false
     @State private var salt: Int = 0
+    @State private var settled: Int = .max
+    @State private var phase: Int = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    public init(text: String, color: Color = .white, accent: Color? = nil, offOpacity: Double = 0.13) {
+    public init(text: String, color: Color = .white, accent: Color? = nil, offOpacity: Double = 0.13, chase: Bool = false) {
         self.text = text
         self.color = color
         self.accent = accent
         self.offOpacity = offOpacity
+        self.chase = chase
     }
 
     static let glyphs: [Character: [[Bool]]] = {
@@ -40,18 +45,33 @@ public struct DotMatrixNumber: View {
         Canvas { ctx, size in
             let cell = size.height / 7
             let r = cell * 0.34
+            let wave = Double(phase % (totalCols + 12)) - 6.0
             for (ci, ch) in chars.enumerated() {
-                let g = Self.glyphs[ch] ?? Self.glyphs["-"]!
+                var g = Self.glyphs[ch] ?? Self.glyphs["-"]!
+                if salt != 0 && ci >= settled && ch.isNumber {
+                    let pool: [Character] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+                    g = Self.glyphs[pool[(salt * 7 + ci * 3) % 10]]!
+                }
                 for row in 0..<7 {
                     for col in 0..<5 where col < g[row].count {
                         let cx = CGFloat(ci * 6 + col) * cell + cell / 2
                         let cy = CGFloat(row) * cell + cell / 2
                         let rect = CGRect(x: cx - r, y: cy - r, width: r * 2, height: r * 2)
                         var on = g[row][col]
-                        if salt != 0 && (row * 31 + col * 17 + ci * 13 + salt * 7) % 5 == 0 { on.toggle() }
+                        if salt != 0 && ci >= settled && (row * 31 + col * 17 + ci * 13 + salt * 7) % 5 == 0 { on.toggle() }
                         let dotColor = (on && ci == chars.count - 1) ? (accent ?? color) : color
-                        ctx.fill(Path(ellipseIn: rect),
-                                 with: .color(dotColor.opacity(on ? 1.0 : offOpacity)))
+                        var alpha = on ? 1.0 : offOpacity
+                        var fill = dotColor
+                        if chase {
+                            let gc = Double(ci * 6 + col)
+                            let boost = max(0.0, 1.0 - abs(gc - wave) / 2.5)
+                            if on {
+                                if boost > 0.45 { fill = .white }
+                            } else {
+                                alpha = max(alpha, boost * 0.38)
+                            }
+                        }
+                        ctx.fill(Path(ellipseIn: rect), with: .color(fill.opacity(alpha)))
                     }
                 }
             }
@@ -60,17 +80,28 @@ public struct DotMatrixNumber: View {
         .accessibilityLabel(text)
         .onChange(of: text) { _, _ in scramble() }
         .onAppear { scramble() }
+        .task(id: chase) {
+            guard chase && !reduceMotion else { return }
+            while !Task.isCancelled {
+                phase += 1
+                try? await Task.sleep(nanoseconds: 85_000_000)
+            }
+        }
     }
 
-    /// LED settle: dots flicker for ~250 ms, then lock — like a real pager.
+    /// Slot-roll settle: digits cycle, then lock one by one, left to right.
     private func scramble() {
         guard !reduceMotion else { return }
+        let count = max(1, text.count)
         Task { @MainActor in
-            for i in 1...5 {
-                salt = i
-                try? await Task.sleep(nanoseconds: 45_000_000)
+            let frames = count + 5
+            for f in 0...frames {
+                salt = f + 1
+                settled = f - 2
+                try? await Task.sleep(nanoseconds: 42_000_000)
             }
             salt = 0
+            settled = .max
         }
     }
 }

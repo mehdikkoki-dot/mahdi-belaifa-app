@@ -346,7 +346,7 @@ struct TicketTab: View {
                 WaitingView(model: app.detail, s: s)
             }
         }
-        .background(Theme.paper.ignoresSafeArea())
+        .background { AmbientBackground() }
         .animation(.spring(response: 0.5, dampingFraction: 0.9), value: app.detail.status)
         .animation(.spring(response: 0.5, dampingFraction: 0.9), value: app.selectedId)
     }
@@ -524,9 +524,11 @@ struct WaitingView: View {
                 .entrance(0)
                 WhiteCard {
                     HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: "bell.badge.fill")
-                            .font(.system(size: 19))
-                            .foregroundStyle(Color(red: 0.13, green: 0.66, blue: 0.33))
+                        SignalWaves {
+                            Image(systemName: "bell.badge.fill")
+                                .font(.system(size: 19))
+                                .foregroundStyle(Color(red: 0.13, green: 0.66, blue: 0.33))
+                        }
                         VStack(alignment: .leading, spacing: 2) {
                             Text(s.alertOn)
                                 .font(.cairo(14, .bold)).foregroundStyle(Theme.ink)
@@ -558,6 +560,7 @@ struct ReadyView: View {
     @ObservedObject var model: TicketModel
     let s: Strings
     @State private var pulse = false
+    @State private var landed = false
 
     var body: some View {
         ScrollView {
@@ -572,7 +575,7 @@ struct ReadyView: View {
                         .font(.cairo(13, .bold)).foregroundStyle(.white.opacity(0.75))
                     DotMatrixNumber(text: model.number,
                                     color: Color(red: 1.0, green: 0.914, blue: 0.878),
-                                    offOpacity: 0)
+                                    offOpacity: 0, chase: true)
                         .frame(height: 92)
                         .padding(.top, 10)
                     HStack(spacing: 7) {
@@ -593,6 +596,8 @@ struct ReadyView: View {
                             .frame(maxWidth: .infinity).padding(.vertical, 16)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 999))
+                            .shadow(color: .white.opacity(model.flashOn ? 0.8 : 0.15),
+                                    radius: model.flashOn ? 18 : 6)
                             .buttonStyle(PressableStyle())
                             .padding(.top, 18)
                     } else {
@@ -609,7 +614,9 @@ struct ReadyView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 26))
                 .shadow(color: Theme.orange.opacity(model.flashOn ? 0.6 : 0.3),
                         radius: model.flashOn ? 32 : 18, y: 10)
-                .scaleEffect(model.ringing && model.flashOn ? 1.015 : 1.0)
+                .shineSweep(radius: 26)
+                .scaleEffect((landed ? 1.0 : 1.07) * (model.ringing && model.flashOn ? 1.015 : 1.0))
+                .opacity(landed ? 1 : 0)
                 .opacity(model.flashOn ? 0.92 : 1.0)
                 .animation(.easeInOut(duration: 0.3), value: model.flashOn)
                 PoweredBy(s: s)
@@ -618,7 +625,10 @@ struct ReadyView: View {
             .padding(.top, 16)
             .padding(.bottom, 20)
         }
-        .onAppear { pulse = true }
+        .onAppear {
+            pulse = true
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.58)) { landed = true }
+        }
     }
 }
 
@@ -721,6 +731,7 @@ struct CompletedView: View {
                     LEDPanel(text: model.number)
                         .frame(height: 168)
                         .entrance(0.05)
+                        .overlay(DotBurst())
                     Text(s.rateTitle)
                         .font(.cairo(21, .black)).foregroundStyle(.white)
                         .entrance(0.14)
@@ -757,6 +768,7 @@ struct CompletedView: View {
                         Haptics.tap()
                         app.closeCurrent()
                     }
+                    .buttonStyle(PressableStyle())
                     .font(.cairo(15, .bold)).foregroundStyle(.white.opacity(0.85))
                     .padding(.top, 4)
                 }
@@ -981,7 +993,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "7.0")
+                    LabeledContent(s.version, value: "8.0")
                 }
             }
             .navigationTitle(s.settingsTitle)
