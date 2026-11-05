@@ -421,13 +421,14 @@ struct ConnectView: View {
     var body: some View {
         VStack(spacing: 18) {
             Spacer()
-            ZStack {
-                Circle().fill(Theme.cardWhite).frame(width: 92, height: 92)
-                    .shadow(color: .black.opacity(0.08), radius: 14, y: 6)
-                Image(systemName: "bell.fill").font(.system(size: 40)).foregroundStyle(Theme.orange)
-                    .symbolEffect(.pulse, options: .repeating, isActive: true)
-            }
-            Text(s.appName).font(.cairo(34, .black)).foregroundStyle(Theme.ink)
+            Image("BrandLogo")
+                .resizable().scaledToFill()
+                .frame(width: 118, height: 118)
+                .clipShape(RoundedRectangle(cornerRadius: 28))
+                .shadow(color: Theme.orange.opacity(0.42), radius: 22, y: 12)
+                .overlay(ShineSweep(corner: 28))
+                .modifier(Entrance(index: 0))
+            BrandWordmark(size: 34, color: Theme.ink)
             Text(s.connectHint)
                 .font(.cairo(15)).foregroundStyle(Theme.tan)
                 .multilineTextAlignment(.center)
@@ -527,6 +528,15 @@ struct WaitingView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 14) {
+                HStack(spacing: 8) {
+                    Image("BrandLogo")
+                        .resizable().scaledToFill()
+                        .frame(width: 26, height: 26)
+                        .clipShape(RoundedRectangle(cornerRadius: 7))
+                    BrandWordmark(size: 16, color: Theme.ink)
+                    Spacer()
+                }
+                .modifier(Entrance(index: 0))
                 WhiteCard {
                     VStack(spacing: 0) {
                         ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
@@ -675,6 +685,10 @@ struct ReadyView: View {
                 .overlay(RoundedRectangle(cornerRadius: 26).stroke(
                     LinearGradient(colors: [Color(red: 1, green: 0.85, blue: 0.4).opacity(0.85), Color(red: 1, green: 0.85, blue: 0.4).opacity(0.15)],
                                    startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1.2))
+                .overlay(GlossBands(opacity: 0.16).clipShape(RoundedRectangle(cornerRadius: 26)))
+                .overlay(alignment: .bottomTrailing) {
+                    BrandWordmark(size: 25, color: .white.opacity(0.22)).padding(18)
+                }
                 .scaleEffect((landed ? 1.0 : 1.07) * (model.ringing && model.flashOn ? 1.015 : 1.0))
                 .opacity(landed ? 1 : 0)
                 .opacity(model.flashOn ? 0.92 : 1.0)
@@ -792,6 +806,8 @@ struct CompletedView: View {
                         .frame(height: 168)
                         .entrance(0.05)
                         .overlay(DotBurst())
+                    BrandWordmark(size: 23, color: .white.opacity(0.9))
+                        .entrance(0.10)
                     Text(s.rateTitle)
                         .font(.cairo(21, .black)).foregroundStyle(.white)
                         .entrance(0.14)
@@ -1058,7 +1074,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "10.1")
+                    LabeledContent(s.version, value: "11.0")
                 }
             }
             .navigationTitle(s.settingsTitle)
