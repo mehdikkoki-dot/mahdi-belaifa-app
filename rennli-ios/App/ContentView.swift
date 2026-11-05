@@ -298,7 +298,7 @@ struct ContentView: View {
                 .tag(2)
         }
         .tint(Theme.orange)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
         .environment(\.layoutDirection, s.isRTL ? .rightToLeft : .leftToRight)
         .onOpenURL { url in
             app.open(rawInput: url.absoluteString)
@@ -346,12 +346,13 @@ struct ConnectView: View {
         VStack(spacing: 18) {
             Spacer()
             ZStack {
-                Circle().fill(Theme.orangeSoft).frame(width: 92, height: 92)
+                Circle().fill(Theme.cardWhite).frame(width: 92, height: 92)
+                    .shadow(color: .black.opacity(0.08), radius: 14, y: 6)
                 Image(systemName: "bell.fill").font(.system(size: 40)).foregroundStyle(Theme.orange)
             }
-            Text(s.appName).font(.cairo(34, .black)).foregroundStyle(Theme.cream)
+            Text(s.appName).font(.cairo(34, .black)).foregroundStyle(Theme.ink)
             Text(s.connectHint)
-                .font(.cairo(15)).foregroundStyle(Theme.mutedScene)
+                .font(.cairo(15)).foregroundStyle(Theme.tan)
                 .multilineTextAlignment(.center)
             Button {
                 showScanner = true
@@ -364,7 +365,7 @@ struct ConnectView: View {
             .sheet(isPresented: $showScanner) {
                 ScannerSheet { code in app.open(rawInput: code) }
             }
-            Text(s.orPaste).font(.cairo(13, .bold)).foregroundStyle(Theme.mutedScene)
+            Text(s.orPaste).font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
             TextField(s.linkPlaceholder, text: $input)
                 .textFieldStyle(.roundedBorder)
                 .font(.cairo(15))
@@ -386,23 +387,34 @@ struct ShopHeader: View {
     let chip: String?
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 11) {
             ZStack {
-                RoundedRectangle(cornerRadius: 12).fill(Theme.ink).frame(width: 38, height: 38)
-                Image(systemName: "bell.fill").font(.system(size: 17)).foregroundStyle(Theme.gold)
+                RoundedRectangle(cornerRadius: 13).fill(Theme.ink).frame(width: 42, height: 42)
+                Text(String(shop.prefix(1)))
+                    .font(.cairo(19, .black)).foregroundStyle(Theme.gold)
             }
-            VStack(alignment: .leading, spacing: 0) {
-                Text(shop).font(.cairo(16, .bold)).foregroundStyle(Theme.ink)
-            }
+            Text(shop).font(.cairo(16.5, .black)).foregroundStyle(Theme.ink)
             Spacer()
             if let chip {
-                Text(chip)
-                    .font(.cairo(12.5, .black)).foregroundStyle(Theme.gold)
-                    .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(Theme.ink)
-                    .clipShape(Capsule())
+                HStack(spacing: 5) {
+                    Circle().fill(Color(red: 0.13, green: 0.72, blue: 0.35)).frame(width: 7, height: 7)
+                    Text(chip).font(.cairo(12.5, .bold)).foregroundStyle(Theme.tan)
+                }
             }
         }
+    }
+}
+
+/// White ticket card with the soft Pingloy-grade shadow.
+struct WhiteCard<Content: View>: View {
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        content
+            .padding(20)
+            .background(Theme.cardWhite)
+            .clipShape(RoundedRectangle(cornerRadius: 24))
+            .shadow(color: .black.opacity(0.07), radius: 18, y: 8)
     }
 }
 
@@ -411,64 +423,56 @@ struct WaitingView: View {
     let s: Strings
 
     var body: some View {
-        VStack(spacing: 0) {
-            TicketCard {
-                VStack(spacing: 0) {
-                    ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
-                               chip: s.live)
-                    Text(s.orderNumber)
-                        .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 20)
-                    DotMatrixNumber(text: model.number, color: Theme.ink, accent: Theme.orange)
-                        .frame(height: 84)
-                        .padding(.top, 8)
-                    Text(s.waitingLine)
-                        .font(.cairo(19, .black)).foregroundStyle(Theme.ink)
-                        .padding(.top, 12)
-                    Text(s.waitingSub)
-                        .font(.cairo(13.5)).foregroundStyle(Theme.tan)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 3)
-                    if let eta = model.etaMinutes, eta > 0 {
-                        Text(s.etaText(eta))
-                            .font(.cairo(13, .black)).foregroundStyle(Theme.gold)
-                            .padding(.horizontal, 14).padding(.vertical, 7)
-                            .background(Theme.ink)
-                            .clipShape(Capsule())
-                            .padding(.top, 12)
+        ScrollView {
+            VStack(spacing: 14) {
+                WhiteCard {
+                    VStack(spacing: 0) {
+                        ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
+                                   chip: s.live)
+                        Text(s.orderNumber)
+                            .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
+                            .padding(.top, 22)
+                        DotMatrixNumber(text: model.number, color: Theme.ink, offOpacity: 0)
+                            .frame(height: 92)
+                            .padding(.top, 10)
+                        Text(s.waitingLine)
+                            .font(.cairo(19, .black)).foregroundStyle(Theme.ink)
+                            .padding(.top, 14)
+                        if let eta = model.etaMinutes, eta > 0 {
+                            Text(s.etaText(eta))
+                                .font(.cairo(13.5)).foregroundStyle(Theme.tan)
+                                .padding(.top, 4)
+                        }
                     }
-                    HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(Theme.greenInk)
-                        Text(s.alertOn)
-                            .font(.cairo(13, .bold)).foregroundStyle(Theme.greenInk)
+                }
+                WhiteCard {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "bell.badge.fill")
+                            .font(.system(size: 19))
+                            .foregroundStyle(Color(red: 0.13, green: 0.66, blue: 0.33))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(s.alertOn)
+                                .font(.cairo(14, .bold)).foregroundStyle(Theme.ink)
+                            Text(s.alertSub)
+                                .font(.cairo(12.5)).foregroundStyle(Theme.tan)
+                        }
+                        Spacer()
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(11)
-                    .background(Theme.greenBg)
-                    .clipShape(RoundedRectangle(cornerRadius: 14))
-                    .padding(.top, 16)
+                    .padding(-4)
+                }
+                VenueLinks(model: model, s: s)
+                PoweredBy(s: s)
+                    .colorScheme(.dark)
+                    .opacity(0.55)
+                    .padding(.top, 2)
+                if !model.error.isEmpty {
+                    Text(model.error).font(.cairo(13)).foregroundStyle(.red)
                 }
             }
-            .padding(.top, 26)
-            VenueLinks(model: model, s: s)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.top, 18)
-            Spacer()
-            VStack(spacing: 3) {
-                Text(s.tagline1)
-                    .font(.cairo(13.5, .bold)).foregroundStyle(Theme.mutedScene)
-                Text(s.tagline2)
-                    .font(.cairo(15, .black)).foregroundStyle(Theme.cream)
-            }
-            .multilineTextAlignment(.center)
-            if !model.error.isEmpty {
-                Text(model.error).font(.cairo(13)).foregroundStyle(.red).padding(.top, 10)
-            }
+            .padding(.horizontal, 18)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
         }
-        .padding(.horizontal, 22)
-        .padding(.bottom, 22)
     }
 }
 
@@ -478,61 +482,61 @@ struct ReadyView: View {
     @State private var pulse = false
 
     var body: some View {
-        ZStack {
-            Theme.readyGradient.ignoresSafeArea()
-                .opacity(model.flashOn ? 0.82 : 1.0)
-                .animation(.easeInOut(duration: 0.25), value: model.flashOn)
-            ForEach(0..<3, id: \.self) { i in
-                Circle()
-                    .stroke(Color.white.opacity(0.35), lineWidth: 2)
-                    .frame(width: 330, height: 330)
-                    .scaleEffect(pulse ? 1.5 + Double(i) * 0.35 : 0.95 + Double(i) * 0.3)
-                    .opacity(pulse ? 0 : 0.5)
-                    .animation(.easeOut(duration: 2.4).repeatForever(autoreverses: false)
-                        .delay(Double(i) * 0.8), value: pulse)
-            }
-            VStack(spacing: 0) {
-                Text(s.ringNow)
-                    .font(.cairo(21, .black)).foregroundStyle(.white)
-                    .padding(.top, 28)
-                Text(s.ringNowSub)
-                    .font(.cairo(13.5, .bold)).foregroundStyle(.white.opacity(0.85))
-                    .padding(.top, 3)
-                TicketCard {
-                    VStack(spacing: 0) {
-                        Text(model.shopName.isEmpty ? s.shopFallback : model.shopName)
-                            .font(.cairo(15, .black)).foregroundStyle(Theme.ink)
-                        Text(s.orderNumber)
-                            .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
-                            .padding(.top, 14)
-                        DotMatrixNumber(text: model.number, color: Theme.orangeDeep, accent: Theme.orangeDeep)
-                            .frame(height: 84)
-                            .padding(.top, 8)
+        ScrollView {
+            VStack(spacing: 14) {
+                VStack(spacing: 0) {
+                    ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
+                               chip: nil)
+                    .padding(.horizontal, 4)
+                }
+                VStack(spacing: 0) {
+                    Text(s.orderNumber)
+                        .font(.cairo(13, .bold)).foregroundStyle(.white.opacity(0.75))
+                    DotMatrixNumber(text: model.number,
+                                    color: Color(red: 1.0, green: 0.914, blue: 0.878),
+                                    offOpacity: 0)
+                        .frame(height: 92)
+                        .padding(.top, 10)
+                    HStack(spacing: 7) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 17))
+                            .foregroundStyle(Color(red: 0.35, green: 0.9, blue: 0.5))
                         Text(s.readyTitle)
-                            .font(.cairo(24, .black)).foregroundStyle(Theme.orangeDeep)
-                            .padding(.top, 12)
-                        Text(s.readySub)
-                            .font(.cairo(14, .bold)).foregroundStyle(Theme.tan)
-                            .padding(.top, 3)
+                            .font(.cairo(20, .black)).foregroundStyle(.white)
+                    }
+                    .padding(.top, 14)
+                    Text(s.readySub)
+                        .font(.cairo(13.5)).foregroundStyle(.white.opacity(0.85))
+                        .padding(.top, 4)
+                    if !model.acked {
+                        Button(s.ackSeen) { model.ack() }
+                            .font(.cairo(17, .black)).foregroundStyle(Theme.orangeDeep)
+                            .frame(maxWidth: .infinity).padding(.vertical, 16)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 999))
+                            .padding(.top, 18)
+                    } else {
+                        Text(s.ackDone)
+                            .font(.cairo(14.5, .bold)).foregroundStyle(.white)
+                            .padding(.top, 18)
                     }
                 }
-                .padding(.top, 24)
-                Spacer()
-                if !model.acked {
-                    Button(s.ackButton) { model.ack() }
-                        .font(.cairo(18, .black)).foregroundStyle(Theme.orangeDeep)
-                        .frame(maxWidth: .infinity).padding(.vertical, 19)
-                        .background(Theme.paperTop)
-                        .clipShape(RoundedRectangle(cornerRadius: 999))
-                        .shadow(color: .black.opacity(0.3), radius: 16, y: 8)
-                } else {
-                    Text(s.ackDone)
-                        .font(.cairo(16, .bold)).foregroundStyle(.white)
-                        .padding(.vertical, 19)
-                }
+                .padding(22)
+                .background(
+                    LinearGradient(colors: [Theme.readyCardTop, Theme.readyCardBottom],
+                                   startPoint: .top, endPoint: .bottom)
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 26))
+                .shadow(color: Theme.orange.opacity(0.35), radius: 20, y: 10)
+                .opacity(model.flashOn ? 0.86 : 1.0)
+                .animation(.easeInOut(duration: 0.25), value: model.flashOn)
+                PoweredBy(s: s)
+                    .colorScheme(.dark)
+                    .opacity(0.55)
             }
-            .padding(.horizontal, 22)
-            .padding(.bottom, 22)
+            .padding(.horizontal, 18)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
         }
         .onAppear { pulse = true }
     }
@@ -543,31 +547,67 @@ struct VenueLinks: View {
     let s: Strings
     @Environment(\.openURL) private var openURL
 
-    private var links: [(String, String, String)] {
-        var out: [(String, String, String)] = []
-        if !model.menuUrl.isEmpty { out.append((s.menu, "book.pages", model.menuUrl)) }
-        if !model.instagramUrl.isEmpty { out.append((s.instagram, "camera", model.instagramUrl)) }
-        if !model.tiktokUrl.isEmpty { out.append((s.tiktok, "music.note", model.tiktokUrl)) }
-        if !model.mapsUrl.isEmpty { out.append((s.map, "map", model.mapsUrl)) }
-        return out
+    private var hasAny: Bool {
+        !model.menuUrl.isEmpty || !model.instagramUrl.isEmpty || !model.tiktokUrl.isEmpty || !model.mapsUrl.isEmpty
     }
 
     var body: some View {
-        if !links.isEmpty {
-            HStack(spacing: 8) {
-                ForEach(Array(links.enumerated()), id: \.offset) { _, link in
-                    Button {
-                        if let u = URL(string: link.2) { openURL(u) }
-                    } label: {
-                        Label(link.0, systemImage: link.1)
-                            .font(.cairo(13.5, .bold))
-                            .padding(.horizontal, 14).padding(.vertical, 9)
-                            .background(Theme.paperTop)
-                            .foregroundStyle(Theme.ink)
-                            .clipShape(Capsule())
+        if hasAny {
+            WhiteCard {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(s.followUs)
+                        .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
+                    if !model.menuUrl.isEmpty {
+                        bigBar(title: s.menu, icon: "book.pages", url: model.menuUrl,
+                               bg: Theme.ink, fg: Theme.paperTop)
+                    }
+                    HStack(spacing: 10) {
+                        if !model.instagramUrl.isEmpty {
+                            smallPill(title: s.instagram, icon: "camera", url: model.instagramUrl)
+                        }
+                        if !model.tiktokUrl.isEmpty {
+                            smallPill(title: s.tiktok, icon: "music.note", url: model.tiktokUrl)
+                        }
+                    }
+                    if !model.mapsUrl.isEmpty {
+                        bigBar(title: s.map, icon: "mappin.and.ellipse", url: model.mapsUrl,
+                               bg: Theme.greyPill, fg: Theme.ink)
                     }
                 }
+                .padding(-4)
             }
+        }
+    }
+
+    private func bigBar(title: String, icon: String, url: String, bg: Color, fg: Color) -> some View {
+        Button {
+            if let u = URL(string: url) { openURL(u) }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: icon).font(.system(size: 15, weight: .bold))
+                Text(title).font(.cairo(15, .black))
+            }
+            .foregroundStyle(fg)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 13)
+            .background(bg)
+            .clipShape(RoundedRectangle(cornerRadius: 13))
+        }
+    }
+
+    private func smallPill(title: String, icon: String, url: String) -> some View {
+        Button {
+            if let u = URL(string: url) { openURL(u) }
+        } label: {
+            HStack(spacing: 7) {
+                Image(systemName: icon).font(.system(size: 14, weight: .bold))
+                Text(title).font(.cairo(14, .bold))
+            }
+            .foregroundStyle(Theme.ink)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 11)
+            .background(Theme.greyPill)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 }
@@ -576,46 +616,124 @@ struct CompletedView: View {
     @ObservedObject var app: AppModel
     @ObservedObject var model: TicketModel
     let s: Strings
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
-        VStack(spacing: 0) {
-            TicketCard {
-                VStack(spacing: 0) {
-                    ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
-                               chip: s.statusShort(model.status))
-                    ZStack {
-                        Circle().fill(Theme.greenBg).frame(width: 96, height: 96)
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 44, weight: .black))
-                            .foregroundStyle(Theme.greenInk)
+        ZStack {
+            Theme.brandGradient.ignoresSafeArea()
+            ScrollView {
+                VStack(spacing: 14) {
+                    HStack(spacing: 11) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 13).fill(Color.white).frame(width: 42, height: 42)
+                            Image(systemName: "bell.fill")
+                                .font(.system(size: 18)).foregroundStyle(Theme.orangeDeep)
+                        }
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(model.shopName.isEmpty ? s.shopFallback : model.shopName)
+                                .font(.cairo(16.5, .black)).foregroundStyle(.white)
+                            Text(s.statusShort(model.status))
+                                .font(.cairo(12.5, .bold)).foregroundStyle(.white.opacity(0.75))
+                        }
+                        Spacer()
                     }
-                    .padding(.top, 22)
-                    Text(s.statusText(model.status))
-                        .font(.cairo(21, .black)).foregroundStyle(Theme.ink)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 14)
-                    Text(s.orderNumber)
-                        .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
-                        .padding(.top, 14)
-                    DotMatrixNumber(text: model.number, color: Theme.ink, accent: Theme.orange)
-                        .frame(height: 48)
-                        .padding(.top, 6)
+                    .padding(.top, 8)
+                    LEDPanel(text: model.number)
+                        .frame(height: 168)
+                    Text(s.rateTitle)
+                        .font(.cairo(21, .black)).foregroundStyle(.white)
+                    if model.status == "completed" && !model.reviewUrl.isEmpty {
+                        FrostedBar(radius: 22) {
+                            VStack(spacing: 8) {
+                                Text(s.thanksTitle)
+                                    .font(.cairo(18, .black)).foregroundStyle(.white)
+                                Text(s.rateLine(model.shopName.isEmpty ? s.shopFallback : model.shopName))
+                                    .font(.cairo(13.5)).foregroundStyle(.white.opacity(0.85))
+                                    .multilineTextAlignment(.center)
+                                Button {
+                                    if let u = URL(string: model.reviewUrl) { openURL(u) }
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "star.fill").font(.system(size: 16))
+                                        Text(s.rateButton).font(.cairo(16, .black))
+                                    }
+                                    .foregroundStyle(Theme.ink)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 999))
+                                }
+                                .padding(.top, 4)
+                            }
+                            .padding(18)
+                        }
+                    }
+                    VenueLinksDark(model: model, s: s)
+                    PoweredBy(s: s)
+                    Button(s.newTicket) {
+                        Haptics.tap()
+                        app.closeCurrent()
+                    }
+                    .font(.cairo(15, .bold)).foregroundStyle(.white.opacity(0.85))
+                    .padding(.top, 4)
+                }
+                .padding(.horizontal, 18)
+                .padding(.bottom, 20)
+            }
+        }
+    }
+}
+
+/// Venue links on the dark completed scene: one frosted menu bar + circles.
+struct VenueLinksDark: View {
+    @ObservedObject var model: TicketModel
+    let s: Strings
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        VStack(spacing: 12) {
+            if !model.menuUrl.isEmpty {
+                FrostedBar(radius: 16) {
+                    Button {
+                        if let u = URL(string: model.menuUrl) { openURL(u) }
+                    } label: {
+                        HStack {
+                            Text(s.menu).font(.cairo(15.5, .black)).foregroundStyle(.white)
+                            Spacer()
+                            Image(systemName: "book.pages").foregroundStyle(.white)
+                        }
+                        .padding(.horizontal, 18).padding(.vertical, 14)
+                    }
                 }
             }
-            .padding(.top, 26)
-            if model.status == "completed" {
-                RatingCard(model: model, s: s).padding(.top, 18)
+            HStack(spacing: 14) {
+                Spacer()
+                if !model.tiktokUrl.isEmpty {
+                    circle(icon: "music.note", url: model.tiktokUrl)
+                }
+                if !model.instagramUrl.isEmpty {
+                    circle(icon: "camera", url: model.instagramUrl)
+                }
+                if !model.mapsUrl.isEmpty {
+                    circle(icon: "mappin.and.ellipse", url: model.mapsUrl)
+                }
+                Spacer()
             }
-            Spacer()
-            Button(s.newTicket) {
-                Haptics.tap()
-                app.closeCurrent()
-            }
-            .font(.cairo(17, .black)).foregroundStyle(Theme.orange)
-            .padding(.top, 18)
         }
-        .padding(.horizontal, 22)
-        .padding(.bottom, 22)
+    }
+
+    private func circle(icon: String, url: String) -> some View {
+        Button {
+            if let u = URL(string: url) { openURL(u) }
+        } label: {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 52, height: 52)
+                .background(Color.white.opacity(0.13))
+                .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 1))
+                .clipShape(Circle())
+        }
     }
 }
 
@@ -663,37 +781,69 @@ struct OrdersView: View {
     @ObservedObject var app: AppModel
     let s: Strings
     var onPick: () -> Void
+    @State private var showScanner = false
 
     var body: some View {
         NavigationStack {
             List {
-                if app.tickets.isEmpty {
-                    Text(s.ordersEmpty).font(.cairo(15)).foregroundStyle(Theme.mutedScene)
-                }
-                ForEach(app.tickets) { t in
+                Section {
                     Button {
-                        app.select(t)
-                        onPick()
+                        showScanner = true
                     } label: {
-                        HStack(spacing: 14) {
-                            DotMatrixNumber(text: t.number, color: Theme.cream, accent: Theme.orange)
-                                .frame(width: 84, height: 30)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(t.shop).font(.cairo(15.5, .bold)).foregroundStyle(Theme.cream)
-                                Text(timeAgo(t.addedAt)).font(.cairo(12.5)).foregroundStyle(Theme.mutedScene)
+                        HStack(spacing: 12) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 13).fill(Theme.orange).frame(width: 44, height: 44)
+                                Image(systemName: "qrcode.viewfinder")
+                                    .font(.system(size: 20, weight: .bold)).foregroundStyle(.white)
+                            }
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(s.scanTitle).font(.cairo(15.5, .black)).foregroundStyle(Theme.ink)
+                                Text(s.scanSub).font(.cairo(12.5)).foregroundStyle(Theme.tan)
                             }
                             Spacer()
-                            StatusPill(status: t.status, s: s)
                         }
-                        .padding(.vertical, 6)
+                        .padding(.vertical, 4)
                     }
-                    .listRowBackground(Theme.card)
+                    .listRowBackground(Theme.cardWhite)
                 }
-                .onDelete(perform: app.remove)
+                Section(s.currentOrders) {
+                    if app.tickets.isEmpty {
+                        Text(s.ordersEmpty).font(.cairo(15)).foregroundStyle(Theme.tan)
+                    }
+                    ForEach(app.tickets) { t in
+                        Button {
+                            app.select(t)
+                            onPick()
+                        } label: {
+                            HStack(spacing: 14) {
+                                DotMatrixNumber(text: t.number, color: Theme.orange, offOpacity: 0)
+                                    .frame(width: 74, height: 27)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(t.shop).font(.cairo(15.5, .bold)).foregroundStyle(Theme.ink)
+                                    Text(timeAgo(t.addedAt)).font(.cairo(12.5)).foregroundStyle(Theme.tan)
+                                }
+                                Spacer()
+                                Text(s.statusShort(t.status))
+                                    .font(.cairo(13, .black))
+                                    .foregroundStyle(t.status == "ready" ? Theme.orange : Theme.tan)
+                            }
+                            .padding(.vertical, 6)
+                        }
+                        .listRowBackground(Theme.cardWhite)
+                    }
+                    .onDelete(perform: app.remove)
+                }
             }
-            .listStyle(.plain)
-            .background(Theme.paper)
+            .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(Theme.canvas)
             .navigationTitle(s.ordersTitle)
+            .sheet(isPresented: $showScanner) {
+                ScannerSheet { code in
+                    app.open(rawInput: code)
+                    onPick()
+                }
+            }
         }
     }
 
@@ -733,7 +883,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "4.0")
+                    LabeledContent(s.version, value: "5.0")
                 }
             }
             .navigationTitle(s.settingsTitle)

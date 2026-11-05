@@ -28,15 +28,28 @@ enum Theme {
     static var paperGradient: LinearGradient {
         LinearGradient(colors: [paperTop, paperBottom], startPoint: .top, endPoint: .bottom)
     }
+    /// The saturated brand field the whole ticket experience lives on.
+    static var brandGradient: LinearGradient {
+        LinearGradient(colors: [Color(red: 0.808, green: 0.290, blue: 0.031),
+                                Color(red: 0.486, green: 0.149, blue: 0.008)],
+                       startPoint: .top, endPoint: .bottom)
+    }
     static var readyGradient: LinearGradient {
         LinearGradient(colors: [orangeBright, orange, orangeDeep], startPoint: .top, endPoint: .bottom)
     }
 
+    // Light app canvas (Pingloy-grade clarity): warm light grey + white cards
+    static let canvas = Color(red: 0.957, green: 0.945, blue: 0.918)      // #F4F1EA
+    static let cardWhite = Color.white
+    static let greyPill = Color(red: 0.933, green: 0.925, blue: 0.898)    // #EEECE5
+    static let readyCardTop = Color(red: 0.965, green: 0.322, blue: 0.043)
+    static let readyCardBottom = Color(red: 0.827, green: 0.220, blue: 0.008)
+
     // Legacy aliases (scene surfaces)
-    static var paper: Color { scene }
-    static var card: Color { sceneCard }
+    static var paper: Color { canvas }
+    static var card: Color { cardWhite }
     static var muted: Color { tan }
-    static var sand: Color { sceneLine }
+    static var sand: Color { greyPill }
     static var orangeSoft: Color { paperTop }
 }
 
@@ -138,8 +151,8 @@ struct StatusPill: View {
         Text(s.statusShort(status))
             .font(.cairo(12, .black))
             .padding(.horizontal, 11).padding(.vertical, 6)
-            .background(status == "ready" ? Theme.orange : Color.white.opacity(0.08))
-            .foregroundStyle(status == "ready" ? .white : Theme.gold)
+            .background(status == "ready" ? Theme.orange : Theme.greyPill)
+            .foregroundStyle(status == "ready" ? .white : Theme.orangeDeep)
             .clipShape(Capsule())
     }
 }
@@ -156,5 +169,43 @@ enum Haptics {
     }
     static func tap() {
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+}
+
+
+/// Frosted glass bar/card on the brand field.
+struct FrostedBar<Content: View>: View {
+    var radius: CGFloat = 18
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        content
+            .background(Color.white.opacity(0.13))
+            .overlay(RoundedRectangle(cornerRadius: radius).stroke(Color.white.opacity(0.20), lineWidth: 1))
+            .clipShape(RoundedRectangle(cornerRadius: radius))
+    }
+}
+
+/// «يعمل بواسطة رنّلي» with a tiny dot-grid mark.
+struct PoweredBy: View {
+    let s: Strings
+
+    var body: some View {
+        HStack(spacing: 7) {
+            Text(s.poweredBy)
+                .font(.cairo(12.5, .bold)).foregroundStyle(.white.opacity(0.65))
+            HStack(spacing: 2.5) {
+                ForEach(0..<3, id: \.self) { _ in
+                    VStack(spacing: 2.5) {
+                        ForEach(0..<3, id: \.self) { _ in
+                            Circle().fill(Theme.orangeBright).frame(width: 3.5, height: 3.5)
+                        }
+                    }
+                }
+            }
+            Text(s.appName)
+                .font(.cairo(13.5, .black)).foregroundStyle(.white.opacity(0.9))
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 }

@@ -79,6 +79,18 @@ struct Strings {
     var ringNow: String { t("جوالك يرن دروك", "Votre téléphone sonne") }
     var ringNowSub: String { t("رنة قوية كيف البيجر — حتى تضغط «جاي»",
                                "Une sonnerie forte, comme un bipeur — jusqu'à votre arrivée") }
+    var alertSub: String { t("تقدر تقفل جوالك — الطلب يبان على شاشة القفل",
+                             "Vous pouvez verrouiller — le ticket reste sur l'écran de verrouillage") }
+    var followUs: String { t("تابعنا", "Suivez-nous") }
+    var scanTitle: String { t("امسح الكود", "Scanner le code") }
+    var scanSub: String { t("وجّه الكاميرا على كود رنّلي", "Pointez la caméra sur un code Rennli") }
+    var currentOrders: String { t("الحالية", "En cours") }
+    var thanksTitle: String { t("شكراً لك!", "Merci !") }
+    func rateLine(_ shop: String) -> String {
+        t("قيّم \(shop) على قوقل ماب، تفرق معنا كثير", "Notez \(shop) sur Google Maps, ça compte beaucoup")
+    }
+    var rateButton: String { t("قيّمنا على قوقل", "Notez-nous sur Google") }
+    var poweredBy: String { t("يعمل بواسطة", "Propulsé par") }
     var newTicket: String { t("تذكرة جديدة", "Nouveau ticket") }
     var scanButton: String { t("امسح كود الطلب", "Scanner le code") }
     var orPaste: String { t("ولا الصق الرابط", "ou collez le lien") }
