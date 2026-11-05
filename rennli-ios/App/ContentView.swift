@@ -21,6 +21,11 @@ struct TicketState: Decodable {
     let tiktokUrl: String?
     let mapsUrl: String?
     let etaMinutes: Int?
+    let position: Int?
+    let etaLive: Int?
+    let near: Bool?
+    let offerText: String?
+    let voiceAnnounce: Bool?
 }
 
 struct StoredTicket: Codable, Identifiable, Equatable {
@@ -43,6 +48,13 @@ final class TicketModel: ObservableObject {
     @Published var tiktokUrl: String = ""
     @Published var mapsUrl: String = ""
     @Published var etaMinutes: Int? = nil
+    @Published var position: Int? = nil
+    @Published var etaLive: Int? = nil
+    @Published var near: Bool = false
+    @Published var offerText: String = ""
+    @Published var voiceAnnounce: Bool = true
+    private var nearBuzzed = false
+    private let synth = AVSpeechSynthesizer()
     @Published var status: String = ""        // waiting | ready | completed
     @Published var acked: Bool = false
     @Published var error: String = ""
@@ -114,6 +126,17 @@ final class TicketModel: ObservableObject {
         if let v = state.tiktokUrl { tiktokUrl = v }
         if let v = state.mapsUrl { mapsUrl = v }
         etaMinutes = state.etaMinutes
+        position = state.position
+        etaLive = state.etaLive
+        offerText = state.offerText ?? ""
+        voiceAnnounce = state.voiceAnnounce ?? true
+        let isNear = (state.near ?? false) && state.status == "waiting"
+        if isNear && !nearBuzzed {
+            nearBuzzed = true
+            AudioServicesPlaySystemSound(1519)
+        }
+        if !isNear && state.status != "waiting" { nearBuzzed = false }
+        near = isNear
         acked = state.acknowledgedAt != nil
         if status == "ready" && !acked {
             if !wasReady { beginRinging() }
@@ -171,6 +194,14 @@ final class TicketModel: ObservableObject {
     private func beginRinging() {
         ringing = true
         Haptics.ready()
+        if voiceAnnounce && UserDefaults.standard.object(forKey: "voiceAnnounceApp") as? Bool != false {
+            let text = s.readyTitle + (shopName.isEmpty ? "" : " — " + shopName)
+            let u = AVSpeechUtterance(string: text)
+            u.rate = 0.48
+            u.voice = AVSpeechSynthesisVoice(language: "ar-SA")
+            synth.stopSpeaking(at: .immediate)
+            synth.speak(u)
+        }
         flashTimer?.invalidate()
         flashTimer = Timer.scheduledTimer(withTimeInterval: 0.55, repeats: true) { [weak self] _ in
             self?.flashOn.toggle()
@@ -514,7 +545,16 @@ struct WaitingView: View {
                         Text(s.waitingLine)
                             .font(.cairo(19, .black)).foregroundStyle(Theme.ink)
                             .padding(.top, 14)
-                        if let eta = model.etaMinutes, eta > 0 {
+                        if let pos = model.position {
+                            Text(pos == 0 ? s.youNext : s.aheadOfYou(pos))
+                                .font(.cairo(14.5, .bold)).foregroundStyle(Theme.orangeDeep)
+                                .padding(.top, 6)
+                            if pos > 0, let eta = model.etaLive {
+                                Text(s.etaText(eta))
+                                    .font(.cairo(13.5)).foregroundStyle(Theme.tan)
+                                    .padding(.top, 2)
+                            }
+                        } else if let eta = model.etaMinutes, eta > 0 {
                             Text(s.etaText(eta))
                                 .font(.cairo(13.5)).foregroundStyle(Theme.tan)
                                 .padding(.top, 4)
@@ -522,6 +562,35 @@ struct WaitingView: View {
                     }
                 }
                 .entrance(0)
+                if model.near {
+                    HStack(spacing: 10) {
+                        Image(systemName: "flame.fill")
+                            .font(.system(size: 17)).foregroundStyle(Color(red: 0.85, green: 0.45, blue: 0.0))
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(s.nearTitle).font(.cairo(14.5, .black)).foregroundStyle(Color(red: 0.45, green: 0.25, blue: 0.0))
+                            Text(s.nearSub).font(.cairo(12.5)).foregroundStyle(Color(red: 0.45, green: 0.25, blue: 0.0).opacity(0.75))
+                        }
+                        Spacer()
+                    }
+                    .padding(16)
+                    .background(Color(red: 1.0, green: 0.95, blue: 0.85))
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .entrance(0.04)
+                }
+                if !model.offerText.isEmpty {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Label(s.offerTitle, systemImage: "tag.fill")
+                            .font(.cairo(13, .black)).foregroundStyle(Theme.goldDeep)
+                        Text(model.offerText)
+                            .font(.cairo(15, .bold)).foregroundStyle(Theme.ink)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(Theme.cardWhite)
+                    .overlay(RoundedRectangle(cornerRadius: 24).stroke(Theme.gold, style: StrokeStyle(lineWidth: 1.6, dash: [7, 5])))
+                    .clipShape(RoundedRectangle(cornerRadius: 24))
+                    .entrance(0.06)
+                }
                 WhiteCard {
                     HStack(alignment: .top, spacing: 10) {
                         SignalWaves {
@@ -967,6 +1036,7 @@ struct OrdersView: View {
 
 struct SettingsView: View {
     let s: Strings
+    @AppStorage("voiceAnnounceApp") private var voiceAnnounceApp: Bool = true
     @AppStorage("tone") private var tone: String = "ring"
     @AppStorage("lang") private var lang: String = "ar"
     @State private var previewPlayer: AVAudioPlayer?
@@ -983,6 +1053,10 @@ struct SettingsView: View {
                     .labelsHidden()
                     .onChange(of: tone) { _, newValue in preview(newValue) }
                 }
+                Section(s.voiceAnnounceSetting) {
+                    Toggle(s.voiceAnnounceSetting, isOn: $voiceAnnounceApp)
+                        .labelsHidden()
+                }
                 Section(s.language) {
                     Picker(s.language, selection: $lang) {
                         Text("العربية").tag("ar")
@@ -993,7 +1067,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "8.0")
+                    LabeledContent(s.version, value: "9.0")
                 }
             }
             .navigationTitle(s.settingsTitle)

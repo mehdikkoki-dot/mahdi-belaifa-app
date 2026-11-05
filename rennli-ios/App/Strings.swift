@@ -95,6 +95,12 @@ struct Strings {
     var scanButton: String { t("امسح كود الطلب", "Scanner le code") }
     var galleryButton: String { t("اقرأ QR من المعرض", "Lire un QR depuis la galerie") }
     var qrNotFound: String { t("ما لقيتش كود QR في هذي الصورة", "Aucun code QR trouvé dans cette image") }
+    var aheadOfYou: (Int) -> String { { n in self.t("قدامك \(n) طلب", "\(n) commande(s) devant vous") } }
+    var youNext: String { t("أنت التالي — طلبك يتحضّر الآن", "Vous êtes le prochain") }
+    var nearTitle: String { t("طلبك قريب", "Votre commande est proche") }
+    var nearSub: String { t("ابقى قريب من الكاشير — دورك وصل تقريباً", "Restez près du comptoir") }
+    var offerTitle: String { t("عرض اليوم", "Offre du jour") }
+    var voiceAnnounceSetting: String { t("إعلان صوتي عند الجاهزية", "Annonce vocale quand c'est prêt") }
     var clearAll: String { t("مسح الكل", "Tout effacer") }
     var clearConfirm: String { t("تمسح كل الطلبات من القائمة؟", "Effacer toutes les commandes de la liste ?") }
     var deleteWord: String { t("مسح", "Effacer") }
