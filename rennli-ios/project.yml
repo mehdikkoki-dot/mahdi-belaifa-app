@@ -9,7 +9,7 @@ settings:
     SWIFT_VERSION: "5.9"
     CODE_SIGNING_ALLOWED: NO
     CODE_SIGNING_REQUIRED: NO
-    MARKETING_VERSION: "2.0"
+    MARKETING_VERSION: "3.0"
     CURRENT_PROJECT_VERSION: "1"
 targets:
   Rennli:
@@ -26,6 +26,7 @@ targets:
       properties:
         CFBundleDisplayName: رنّلي
         NSSupportsLiveActivities: true
+        NSCameraUsageDescription: رنّلي يحتاج الكاميرا لمسح كود الطلب الموجود على الوصل
         UIAppFonts:
           - cairo-400.ttf
           - cairo-700.ttf

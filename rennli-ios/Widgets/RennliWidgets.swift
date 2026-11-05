@@ -23,8 +23,8 @@ struct TicketLiveActivity: Widget {
                         .foregroundStyle(context.state.status == "ready" ? .white : .primary)
                 }
                 Spacer()
-                Text(context.attributes.number)
-                    .font(.system(size: 40, weight: .black))
+                DotMatrixNumber(text: context.attributes.number, color: .white)
+                    .frame(height: 46)
             }
             .padding(16)
             .activityBackgroundTint(context.state.status == "ready"

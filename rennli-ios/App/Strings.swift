@@ -71,6 +71,14 @@ struct Strings {
     var device: String { t("معرّف الجهاز", "Identifiant de l'appareil") }
     var version: String { t("النسخة", "Version") }
 
+    var scanButton: String { t("امسح كود الطلب", "Scanner le code") }
+    var orPaste: String { t("ولا الصق الرابط", "ou collez le lien") }
+    func etaText(_ m: Int) -> String { t("خلال \(m) دقيقة تقريباً", "dans environ \(m) min") }
+    var menu: String { t("المنيو", "Menu") }
+    var instagram: String { t("انستغرام", "Instagram") }
+    var tiktok: String { t("تيك توك", "TikTok") }
+    var map: String { t("الخريطة", "Plan") }
+
     static func current() -> Strings {
         Strings(lang: UserDefaults.standard.string(forKey: "lang") ?? "ar")
     }

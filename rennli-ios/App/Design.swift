@@ -88,3 +88,18 @@ struct StatusPill: View {
             .clipShape(Capsule())
     }
 }
+
+/// Felt, not seen: a pager you can feel in your pocket.
+enum Haptics {
+    static func ready() {
+        let gen = UINotificationFeedbackGenerator()
+        gen.notificationOccurred(.error)   // strongest built-in pattern — a pager buzz
+        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+    }
+    static func success() {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+    }
+    static func tap() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+}

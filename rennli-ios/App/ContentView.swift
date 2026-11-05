@@ -14,6 +14,11 @@ struct TicketState: Decodable {
     let acknowledgedAt: Double?
     let shopName: String?
     let reviewUrl: String?
+    let menuUrl: String?
+    let instagramUrl: String?
+    let tiktokUrl: String?
+    let mapsUrl: String?
+    let etaMinutes: Int?
 }
 
 struct StoredTicket: Codable, Identifiable, Equatable {
@@ -31,6 +36,11 @@ final class TicketModel: ObservableObject {
     @Published var number: String = ""
     @Published var shopName: String = ""
     @Published var reviewUrl: String = ""
+    @Published var menuUrl: String = ""
+    @Published var instagramUrl: String = ""
+    @Published var tiktokUrl: String = ""
+    @Published var mapsUrl: String = ""
+    @Published var etaMinutes: Int? = nil
     @Published var status: String = ""        // waiting | ready | completed
     @Published var acked: Bool = false
     @Published var error: String = ""
@@ -90,6 +100,11 @@ final class TicketModel: ObservableObject {
         status = state.status
         if let sn = state.shopName, !sn.isEmpty { shopName = sn }
         if let ru = state.reviewUrl, !ru.isEmpty { reviewUrl = ru }
+        if let v = state.menuUrl { menuUrl = v }
+        if let v = state.instagramUrl { instagramUrl = v }
+        if let v = state.tiktokUrl { tiktokUrl = v }
+        if let v = state.mapsUrl { mapsUrl = v }
+        etaMinutes = state.etaMinutes
         acked = state.acknowledgedAt != nil
         if status == "ready" && !acked {
             if !wasReady { beginRinging() }
@@ -142,6 +157,7 @@ final class TicketModel: ObservableObject {
 
     private func beginRinging() {
         ringing = true
+        Haptics.ready()
         flashTimer?.invalidate()
         flashTimer = Timer.scheduledTimer(withTimeInterval: 0.55, repeats: true) { [weak self] _ in
             self?.flashOn.toggle()
@@ -169,6 +185,7 @@ final class TicketModel: ObservableObject {
         req.httpMethod = "POST"
         let request = req
         stopRinging()
+        Haptics.success()
         acked = true
         Task {
             _ = try? await URLSession.shared.data(for: request)
@@ -301,6 +318,7 @@ struct ConnectView: View {
     @ObservedObject var app: AppModel
     let s: Strings
     @State private var input: String = ""
+    @State private var showScanner = false
 
     var body: some View {
         VStack(spacing: 18) {
@@ -313,6 +331,18 @@ struct ConnectView: View {
             Text(s.connectHint)
                 .font(.cairo(15)).foregroundStyle(Theme.muted)
                 .multilineTextAlignment(.center)
+            Button {
+                showScanner = true
+            } label: {
+                Label(s.scanButton, systemImage: "qrcode.viewfinder")
+                    .font(.cairo(18, .black))
+                    .frame(maxWidth: .infinity).padding(.vertical, 8)
+            }
+            .buttonStyle(.borderedProminent).tint(Theme.orange)
+            .sheet(isPresented: $showScanner) {
+                ScannerSheet { code in app.open(rawInput: code) }
+            }
+            Text(s.orPaste).font(.cairo(13, .bold)).foregroundStyle(Theme.muted)
             TextField(s.linkPlaceholder, text: $input)
                 .textFieldStyle(.roundedBorder)
                 .font(.cairo(15))
@@ -369,7 +399,15 @@ struct WaitingView: View {
                 .padding(.top, 42)
             HeroNumber(number: model.number)
             Text(s.waitingLine).font(.cairo(19, .bold)).foregroundStyle(Theme.ink).padding(.top, 8)
+            if let eta = model.etaMinutes, eta > 0 {
+                Label(s.etaText(eta), systemImage: "clock")
+                    .font(.cairo(14, .bold)).foregroundStyle(Theme.orangeDeep)
+                    .padding(.horizontal, 12).padding(.vertical, 6)
+                    .background(Theme.orangeSoft).clipShape(Capsule())
+                    .padding(.top, 8)
+            }
             Text(s.waitingSub).font(.cairo(14)).foregroundStyle(Theme.muted).padding(.top, 4)
+            VenueLinks(model: model, s: s).padding(.top, 16)
             Spacer()
             VStack(spacing: 0) {
                 stepRow(done: true, current: false, label: s.stepReceived, symbol: "✓")
@@ -456,6 +494,41 @@ struct ReadyView: View {
             .padding(.bottom, 22)
         }
         .onAppear { pulse = true }
+    }
+}
+
+struct VenueLinks: View {
+    @ObservedObject var model: TicketModel
+    let s: Strings
+    @Environment(\.openURL) private var openURL
+
+    private var links: [(String, String, String)] {
+        var out: [(String, String, String)] = []
+        if !model.menuUrl.isEmpty { out.append((s.menu, "book.pages", model.menuUrl)) }
+        if !model.instagramUrl.isEmpty { out.append((s.instagram, "camera", model.instagramUrl)) }
+        if !model.tiktokUrl.isEmpty { out.append((s.tiktok, "music.note", model.tiktokUrl)) }
+        if !model.mapsUrl.isEmpty { out.append((s.map, "map", model.mapsUrl)) }
+        return out
+    }
+
+    var body: some View {
+        if !links.isEmpty {
+            HStack(spacing: 8) {
+                ForEach(Array(links.enumerated()), id: \.offset) { _, link in
+                    Button {
+                        if let u = URL(string: link.2) { openURL(u) }
+                    } label: {
+                        Label(link.0, systemImage: link.1)
+                            .font(.cairo(13.5, .bold))
+                            .padding(.horizontal, 12).padding(.vertical, 8)
+                            .background(Theme.sand.opacity(0.55))
+                            .foregroundStyle(Theme.ink)
+                            .clipShape(Capsule())
+                    }
+                }
+                Spacer()
+            }
+        }
     }
 }
 
