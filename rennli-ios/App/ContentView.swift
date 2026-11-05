@@ -276,6 +276,12 @@ final class AppModel: ObservableObject {
             UserDefaults.standard.set(data, forKey: "tickets")
         }
     }
+
+    func clearAll() {
+        tickets = []
+        UserDefaults.standard.removeObject(forKey: "tickets")
+        selectedId = ""
+    }
 }
 
 // MARK: - Root
@@ -839,6 +845,7 @@ struct OrdersView: View {
     let s: Strings
     var onPick: () -> Void
     @State private var showScanner = false
+    @State private var confirmClear = false
 
     var body: some View {
         NavigationStack {
@@ -895,6 +902,19 @@ struct OrdersView: View {
             .scrollContentBackground(.hidden)
             .background(Theme.canvas)
             .navigationTitle(s.ordersTitle)
+            .toolbar {
+                if !app.tickets.isEmpty {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button(role: .destructive) { confirmClear = true } label: {
+                            Label(s.clearAll, systemImage: "trash")
+                        }
+                        .tint(Theme.orange)
+                    }
+                }
+            }
+            .confirmationDialog(s.clearConfirm, isPresented: $confirmClear, titleVisibility: .visible) {
+                Button(s.deleteWord, role: .destructive) { app.clearAll() }
+            }
             .sheet(isPresented: $showScanner) {
                 ScannerSheet { code in
                     app.open(rawInput: code)
@@ -940,7 +960,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "6.2")
+                    LabeledContent(s.version, value: "6.3")
                 }
             }
             .navigationTitle(s.settingsTitle)

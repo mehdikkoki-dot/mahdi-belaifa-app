@@ -95,6 +95,9 @@ struct Strings {
     var scanButton: String { t("امسح كود الطلب", "Scanner le code") }
     var galleryButton: String { t("اقرأ QR من المعرض", "Lire un QR depuis la galerie") }
     var qrNotFound: String { t("ما لقيتش كود QR في هذي الصورة", "Aucun code QR trouvé dans cette image") }
+    var clearAll: String { t("مسح الكل", "Tout effacer") }
+    var clearConfirm: String { t("تمسح كل الطلبات من القائمة؟", "Effacer toutes les commandes de la liste ?") }
+    var deleteWord: String { t("مسح", "Effacer") }
     var orPaste: String { t("ولا الصق الرابط", "ou collez le lien") }
     func etaText(_ m: Int) -> String { t("خلال \(m) دقيقة تقريباً", "dans environ \(m) min") }
     var menu: String { t("المنيو", "Menu") }
