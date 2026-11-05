@@ -1,6 +1,7 @@
 name: Rennli
 options:
   bundleIdPrefix: com.example
+  projectFormat: xcode15
   deploymentTarget:
     iOS: "16.1"
 settings:
