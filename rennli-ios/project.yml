@@ -1,0 +1,49 @@
+name: Rennli
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    iOS: "16.1"
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGNING_REQUIRED: NO
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  Rennli:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - Shared
+    dependencies:
+      - target: RennliWidgets
+        embed: true
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: رنّلي
+        NSSupportsLiveActivities: true
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.rennli
+        TARGETED_DEVICE_FAMILY: "1"
+  RennliWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Widgets
+      - Shared
+    info:
+      path: Widgets/Info.plist
+      properties:
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.rennli.widgets
+        TARGETED_DEVICE_FAMILY: "1"
