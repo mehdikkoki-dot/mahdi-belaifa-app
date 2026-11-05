@@ -205,3 +205,5 @@ struct AdCarouselView: View {
         .padding(10)
     }
 }
+
+// v11.3 — ads are fetched per ticket shop.
