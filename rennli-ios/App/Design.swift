@@ -215,3 +215,56 @@ struct PoweredBy: View {
         .frame(maxWidth: .infinity, alignment: .center)
     }
 }
+
+
+// MARK: - Motion kit (60 fps, Reduce-Motion aware)
+
+/// Staggered entrance: rise + fade on a spring. Degrades to a plain
+/// fade when the system Reduce Motion setting is on.
+struct Entrance: ViewModifier {
+    let delay: Double
+    @State private var shown = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(shown ? 1 : 0)
+            .offset(y: shown || reduceMotion ? 0 : 16)
+            .onAppear {
+                withAnimation(.spring(response: 0.55, dampingFraction: 0.86).delay(reduceMotion ? 0 : delay)) {
+                    shown = true
+                }
+            }
+    }
+}
+
+/// Tactile press feedback for primary buttons.
+struct PressableStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.965 : 1)
+            .opacity(configuration.isPressed ? 0.92 : 1)
+            .animation(.spring(response: 0.28, dampingFraction: 0.7), value: configuration.isPressed)
+    }
+}
+
+/// A small live dot that breathes while an order is ready.
+struct PulsingDot: View {
+    @State private var on = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        Circle()
+            .fill(Theme.orange)
+            .frame(width: 9, height: 9)
+            .opacity(on ? 0.35 : 1)
+            .onAppear {
+                guard !reduceMotion else { return }
+                withAnimation(.easeInOut(duration: 0.7).repeatForever(autoreverses: true)) { on = true }
+            }
+    }
+}
+
+extension View {
+    func entrance(_ delay: Double = 0) -> some View { modifier(Entrance(delay: delay)) }
+}

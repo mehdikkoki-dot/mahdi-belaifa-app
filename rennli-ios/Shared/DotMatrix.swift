@@ -7,6 +7,8 @@ public struct DotMatrixNumber: View {
     var color: Color = .white
     var accent: Color? = nil
     var offOpacity: Double = 0.13
+    @State private var salt: Int = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public init(text: String, color: Color = .white, accent: Color? = nil, offOpacity: Double = 0.13) {
         self.text = text
@@ -45,7 +47,8 @@ public struct DotMatrixNumber: View {
                         let cx = CGFloat(ci * 6 + col) * cell + cell / 2
                         let cy = CGFloat(row) * cell + cell / 2
                         let rect = CGRect(x: cx - r, y: cy - r, width: r * 2, height: r * 2)
-                        let on = g[row][col]
+                        var on = g[row][col]
+                        if salt != 0 && (row * 31 + col * 17 + ci * 13 + salt * 7) % 5 == 0 { on.toggle() }
                         let dotColor = (on && ci == chars.count - 1) ? (accent ?? color) : color
                         ctx.fill(Path(ellipseIn: rect),
                                  with: .color(dotColor.opacity(on ? 1.0 : offOpacity)))
@@ -55,6 +58,20 @@ public struct DotMatrixNumber: View {
         }
         .aspectRatio(CGFloat(totalCols) / 7.0, contentMode: .fit)
         .accessibilityLabel(text)
+        .onChange(of: text) { _, _ in scramble() }
+        .onAppear { scramble() }
+    }
+
+    /// LED settle: dots flicker for ~250 ms, then lock — like a real pager.
+    private func scramble() {
+        guard !reduceMotion else { return }
+        Task { @MainActor in
+            for i in 1...5 {
+                salt = i
+                try? await Task.sleep(nanoseconds: 45_000_000)
+            }
+            salt = 0
+        }
     }
 }
 
@@ -64,6 +81,8 @@ public struct DotMatrixNumber: View {
 public struct LEDPanel: View {
     let text: String
     var lit: Color = Color(red: 0.93, green: 0.87, blue: 0.74)
+    @State private var salt: Int = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public init(text: String, lit: Color = Color(red: 0.93, green: 0.87, blue: 0.74)) {
         self.text = text
@@ -93,6 +112,7 @@ public struct LEDPanel: View {
                             on = g[gr][cc]
                         }
                     }
+                    if salt != 0 && (row * 29 + col * 11 + salt * 5) % 9 == 0 { on.toggle() }
                     let cx = CGFloat(col) * cell + cell / 2
                     let cy = CGFloat(row) * cell + cell / 2
                     ctx.fill(Path(ellipseIn: CGRect(x: cx - r, y: cy - r, width: r * 2, height: r * 2)),
@@ -104,5 +124,15 @@ public struct LEDPanel: View {
         .clipShape(RoundedRectangle(cornerRadius: 26))
         .overlay(RoundedRectangle(cornerRadius: 26).stroke(Color.white.opacity(0.16), lineWidth: 1))
         .accessibilityLabel(text)
+        .onAppear {
+            guard !reduceMotion else { return }
+            Task { @MainActor in
+                for i in 1...4 {
+                    salt = i
+                    try? await Task.sleep(nanoseconds: 55_000_000)
+                }
+                salt = 0
+            }
+        }
     }
 }

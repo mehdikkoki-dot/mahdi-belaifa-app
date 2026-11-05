@@ -347,6 +347,8 @@ struct TicketTab: View {
             }
         }
         .background(Theme.paper.ignoresSafeArea())
+        .animation(.spring(response: 0.5, dampingFraction: 0.9), value: app.detail.status)
+        .animation(.spring(response: 0.5, dampingFraction: 0.9), value: app.selectedId)
     }
 }
 
@@ -398,6 +400,7 @@ struct ConnectView: View {
                 Circle().fill(Theme.cardWhite).frame(width: 92, height: 92)
                     .shadow(color: .black.opacity(0.08), radius: 14, y: 6)
                 Image(systemName: "bell.fill").font(.system(size: 40)).foregroundStyle(Theme.orange)
+                    .symbolEffect(.wiggle, options: .nonRepeating, isActive: true)
             }
             Text(s.appName).font(.cairo(34, .black)).foregroundStyle(Theme.ink)
             Text(s.connectHint)
@@ -518,6 +521,7 @@ struct WaitingView: View {
                         }
                     }
                 }
+                .entrance(0)
                 WhiteCard {
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: "bell.badge.fill")
@@ -533,9 +537,12 @@ struct WaitingView: View {
                     }
                     .padding(-4)
                 }
+                .entrance(0.08)
                 VenueLinks(model: model, s: s)
+                    .entrance(0.16)
                 PoweredBy(s: s)
                     .padding(.top, 2)
+                    .entrance(0.24)
                 if !model.error.isEmpty {
                     Text(model.error).font(.cairo(13)).foregroundStyle(.red)
                 }
@@ -572,6 +579,7 @@ struct ReadyView: View {
                         Image(systemName: "checkmark.circle.fill")
                             .font(.system(size: 17))
                             .foregroundStyle(Color(red: 0.35, green: 0.9, blue: 0.5))
+                            .symbolEffect(.bounce, value: model.status)
                         Text(s.readyTitle)
                             .font(.cairo(20, .black)).foregroundStyle(.white)
                     }
@@ -585,6 +593,7 @@ struct ReadyView: View {
                             .frame(maxWidth: .infinity).padding(.vertical, 16)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 999))
+                            .buttonStyle(PressableStyle())
                             .padding(.top, 18)
                     } else {
                         Text(s.ackDone)
@@ -598,9 +607,11 @@ struct ReadyView: View {
                                    startPoint: .top, endPoint: .bottom)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 26))
-                .shadow(color: Theme.orange.opacity(0.35), radius: 20, y: 10)
-                .opacity(model.flashOn ? 0.86 : 1.0)
-                .animation(.easeInOut(duration: 0.25), value: model.flashOn)
+                .shadow(color: Theme.orange.opacity(model.flashOn ? 0.6 : 0.3),
+                        radius: model.flashOn ? 32 : 18, y: 10)
+                .scaleEffect(model.ringing && model.flashOn ? 1.015 : 1.0)
+                .opacity(model.flashOn ? 0.92 : 1.0)
+                .animation(.easeInOut(duration: 0.3), value: model.flashOn)
                 PoweredBy(s: s)
             }
             .padding(.horizontal, 18)
@@ -709,8 +720,10 @@ struct CompletedView: View {
                     .padding(.top, 8)
                     LEDPanel(text: model.number)
                         .frame(height: 168)
+                        .entrance(0.05)
                     Text(s.rateTitle)
                         .font(.cairo(21, .black)).foregroundStyle(.white)
+                        .entrance(0.14)
                     if model.status == "completed" && !model.reviewUrl.isEmpty {
                         FrostedBar(radius: 22) {
                             VStack(spacing: 8) {
@@ -738,6 +751,7 @@ struct CompletedView: View {
                         }
                     }
                     VenueLinksDark(model: model, s: s)
+                        .entrance(0.2)
                     PoweredBy(s: s, dark: true)
                     Button(s.newTicket) {
                         Haptics.tap()
@@ -893,6 +907,7 @@ struct OrdersView: View {
                                     Text(timeAgo(t.addedAt)).font(.cairo(12.5)).foregroundStyle(Theme.tan)
                                 }
                                 Spacer()
+                                if t.status == "ready" { PulsingDot() }
                                 Text(s.statusShort(t.status))
                                     .font(.cairo(13, .black))
                                     .foregroundStyle(t.status == "ready" ? Theme.orange : Theme.tan)
@@ -966,7 +981,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "6.4")
+                    LabeledContent(s.version, value: "7.0")
                 }
             }
             .navigationTitle(s.settingsTitle)
