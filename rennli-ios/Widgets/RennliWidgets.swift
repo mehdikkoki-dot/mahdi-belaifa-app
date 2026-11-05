@@ -28,8 +28,8 @@ struct TicketLiveActivity: Widget {
             }
             .padding(16)
             .activityBackgroundTint(context.state.status == "ready"
-                ? Color(red: 0.957, green: 0.318, blue: 0.043)
-                : Color(red: 0.090, green: 0.066, blue: 0.043))
+                ? Color(red: 1.00, green: 0.231, blue: 0.188)
+                : Color(red: 0.110, green: 0.110, blue: 0.118))
             .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
             DynamicIsland {
@@ -44,14 +44,14 @@ struct TicketLiveActivity: Widget {
                 DynamicIslandExpandedRegion(.bottom) {
                     Text(context.state.statusText)
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(context.state.status == "ready" ? Color(red: 0.97, green: 0.40, blue: 0.03) : .primary)
+                        .foregroundStyle(context.state.status == "ready" ? Color(red: 1.00, green: 0.231, blue: 0.188) : .primary)
                 }
             } compactLeading: {
                 Text("رنّلي").font(.system(size: 12, weight: .bold))
             } compactTrailing: {
                 Text(context.attributes.number)
                     .font(.system(size: 14, weight: .black))
-                    .foregroundStyle(context.state.status == "ready" ? Color(red: 0.97, green: 0.40, blue: 0.03) : .primary)
+                    .foregroundStyle(context.state.status == "ready" ? Color(red: 1.00, green: 0.231, blue: 0.188) : .primary)
             } minimal: {
                 Text(context.attributes.number)
                     .font(.system(size: 12, weight: .black))

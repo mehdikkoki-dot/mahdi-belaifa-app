@@ -6,32 +6,34 @@ import UIKit
 /// is an LED dot-matrix display. The scene is always dark — the ticket is
 /// the light.
 enum Theme {
-    static let scene = Color(red: 0.090, green: 0.066, blue: 0.043)       // #17110B
-    static let sceneCard = Color(red: 0.141, green: 0.102, blue: 0.063)   // #241A10
-    static let sceneLine = Color(red: 0.227, green: 0.173, blue: 0.110)   // #3A2C1C
-    static let cream = Color(red: 1.00, green: 0.969, blue: 0.929)        // #FFF7ED
-    static let mutedScene = Color(red: 0.722, green: 0.647, blue: 0.549)  // #B8A58C
+    // Apple system scales: label / secondaryLabel / grouped background.
+    static let scene = Color(red: 0.110, green: 0.110, blue: 0.118)       // #1C1C1E
+    static let sceneCard = Color(red: 0.173, green: 0.173, blue: 0.180)
+    static let sceneLine = Color(red: 0.290, green: 0.290, blue: 0.310)
+    static let cream = Color(red: 1.00, green: 0.969, blue: 0.929)
+    static let mutedScene = Color(red: 0.690, green: 0.690, blue: 0.710)
 
-    static let paperTop = Color(red: 1.00, green: 0.976, blue: 0.933)      // #FFF9EE
-    static let paperBottom = Color(red: 1.00, green: 0.937, blue: 0.847)  // #FFEFD8
-    static let ink = Color(red: 0.169, green: 0.102, blue: 0.071)         // #2B1A12
-    static let tan = Color(red: 0.663, green: 0.561, blue: 0.463)         // #A98F76
+    static let paperTop = Color.white
+    static let paperBottom = Color(red: 0.949, green: 0.949, blue: 0.969)
+    static let ink = Color(red: 0.110, green: 0.110, blue: 0.118)         // #1C1C1E Apple label
+    static let tan = Color(red: 0.431, green: 0.431, blue: 0.451)         // #6E6E73 Apple secondaryLabel
 
-    static let orange = Color(red: 0.957, green: 0.318, blue: 0.043)      // #F4510B
-    static let orangeBright = Color(red: 1.00, green: 0.471, blue: 0.278) // #FF7847
-    static let orangeDeep = Color(red: 0.839, green: 0.239, blue: 0.008)  // #D63D02
-    static let gold = Color(red: 1.00, green: 0.725, blue: 0.125)         // #FFB020
-    static let goldDeep = Color(red: 0.80, green: 0.52, blue: 0.05)
-    static let greenBg = Color(red: 0.914, green: 0.976, blue: 0.941)     // #E9F9F0
-    static let greenInk = Color(red: 0.055, green: 0.420, blue: 0.263)    // #0E6B43
+    /// Rennli Red — vivid, saturated, unmissable.
+    static let orange = Color(red: 1.00, green: 0.231, blue: 0.188)       // #FF3B30
+    static let orangeBright = Color(red: 1.00, green: 0.373, blue: 0.322) // #FF5F52
+    static let orangeDeep = Color(red: 0.843, green: 0.000, blue: 0.082)  // #D70015
+    static let gold = Color(red: 1.00, green: 0.725, blue: 0.125)
+    static let goldDeep = Color(red: 0.72, green: 0.45, blue: 0.02)
+    static let greenBg = Color(red: 0.910, green: 0.969, blue: 0.929)
+    static let greenInk = Color(red: 0.141, green: 0.541, blue: 0.239)    // Apple systemGreen (dark variant)
 
     static var paperGradient: LinearGradient {
         LinearGradient(colors: [paperTop, paperBottom], startPoint: .top, endPoint: .bottom)
     }
     /// The saturated brand field the whole ticket experience lives on.
     static var brandGradient: LinearGradient {
-        LinearGradient(colors: [Color(red: 0.808, green: 0.290, blue: 0.031),
-                                Color(red: 0.486, green: 0.149, blue: 0.008)],
+        LinearGradient(colors: [Color(red: 0.843, green: 0.000, blue: 0.082),
+                                Color(red: 0.478, green: 0.047, blue: 0.012)],
                        startPoint: .top, endPoint: .bottom)
     }
     static var readyGradient: LinearGradient {
@@ -39,11 +41,11 @@ enum Theme {
     }
 
     // Light app canvas (Pingloy-grade clarity): warm light grey + white cards
-    static let canvas = Color(red: 0.957, green: 0.945, blue: 0.918)      // #F4F1EA
+    static let canvas = Color(red: 0.949, green: 0.949, blue: 0.969)      // #F2F2F7 iOS grouped bg
     static let cardWhite = Color.white
-    static let greyPill = Color(red: 0.933, green: 0.925, blue: 0.898)    // #EEECE5
-    static let readyCardTop = Color(red: 0.965, green: 0.322, blue: 0.043)
-    static let readyCardBottom = Color(red: 0.827, green: 0.220, blue: 0.008)
+    static let greyPill = Color(red: 0.898, green: 0.898, blue: 0.918)    // #E5E5EA
+    static let readyCardTop = Color(red: 1.00, green: 0.231, blue: 0.188)
+    static let readyCardBottom = Color(red: 0.843, green: 0.000, blue: 0.082)
 
     // Legacy aliases (scene surfaces)
     static var paper: Color { canvas }
@@ -187,24 +189,28 @@ struct FrostedBar<Content: View>: View {
 }
 
 /// «يعمل بواسطة رنّلي» with a tiny dot-grid mark.
+/// `dark` = sits on the red/dark scene (white text); otherwise grey on light.
 struct PoweredBy: View {
     let s: Strings
+    var dark: Bool = false
 
     var body: some View {
         HStack(spacing: 7) {
             Text(s.poweredBy)
-                .font(.cairo(12.5, .bold)).foregroundStyle(.white.opacity(0.65))
+                .font(.cairo(12.5, .bold))
+                .foregroundStyle(dark ? .white.opacity(0.7) : Theme.tan)
             HStack(spacing: 2.5) {
                 ForEach(0..<3, id: \.self) { _ in
                     VStack(spacing: 2.5) {
                         ForEach(0..<3, id: \.self) { _ in
-                            Circle().fill(Theme.orangeBright).frame(width: 3.5, height: 3.5)
+                            Circle().fill(Theme.orange).frame(width: 3.5, height: 3.5)
                         }
                     }
                 }
             }
             Text(s.appName)
-                .font(.cairo(13.5, .black)).foregroundStyle(.white.opacity(0.9))
+                .font(.cairo(13.5, .black))
+                .foregroundStyle(dark ? .white.opacity(0.95) : Theme.ink)
         }
         .frame(maxWidth: .infinity, alignment: .center)
     }

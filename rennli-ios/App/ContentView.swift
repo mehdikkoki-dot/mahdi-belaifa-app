@@ -389,9 +389,9 @@ struct ShopHeader: View {
     var body: some View {
         HStack(spacing: 11) {
             ZStack {
-                RoundedRectangle(cornerRadius: 13).fill(Theme.ink).frame(width: 42, height: 42)
+                RoundedRectangle(cornerRadius: 13).fill(Theme.orange).frame(width: 42, height: 42)
                 Text(String(shop.prefix(1)))
-                    .font(.cairo(19, .black)).foregroundStyle(Theme.gold)
+                    .font(.cairo(19, .black)).foregroundStyle(.white)
             }
             Text(shop).font(.cairo(16.5, .black)).foregroundStyle(Theme.ink)
             Spacer()
@@ -462,8 +462,6 @@ struct WaitingView: View {
                 }
                 VenueLinks(model: model, s: s)
                 PoweredBy(s: s)
-                    .colorScheme(.dark)
-                    .opacity(0.55)
                     .padding(.top, 2)
                 if !model.error.isEmpty {
                     Text(model.error).font(.cairo(13)).foregroundStyle(.red)
@@ -531,8 +529,6 @@ struct ReadyView: View {
                 .opacity(model.flashOn ? 0.86 : 1.0)
                 .animation(.easeInOut(duration: 0.25), value: model.flashOn)
                 PoweredBy(s: s)
-                    .colorScheme(.dark)
-                    .opacity(0.55)
             }
             .padding(.horizontal, 18)
             .padding(.top, 16)
@@ -559,7 +555,7 @@ struct VenueLinks: View {
                         .font(.cairo(13, .bold)).foregroundStyle(Theme.tan)
                     if !model.menuUrl.isEmpty {
                         bigBar(title: s.menu, icon: "book.pages", url: model.menuUrl,
-                               bg: Theme.ink, fg: Theme.paperTop)
+                               bg: Theme.orange, fg: Color.white)
                     }
                     HStack(spacing: 10) {
                         if !model.instagramUrl.isEmpty {
@@ -669,7 +665,7 @@ struct CompletedView: View {
                         }
                     }
                     VenueLinksDark(model: model, s: s)
-                    PoweredBy(s: s)
+                    PoweredBy(s: s, dark: true)
                     Button(s.newTicket) {
                         Haptics.tap()
                         app.closeCurrent()
@@ -883,7 +879,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "5.0")
+                    LabeledContent(s.version, value: "6.0")
                 }
             }
             .navigationTitle(s.settingsTitle)
