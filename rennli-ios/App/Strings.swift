@@ -7,7 +7,7 @@ struct Strings {
 
     private func t(_ ar: String, _ fr: String) -> String { lang == "ar" ? ar : fr }
 
-    var appName: String { t("رنّلي", "Rennli") }
+    var appName: String { "C'est Fait!" }
     var tabTicket: String { t("تذكرتي", "Mon ticket") }
     var tabOrders: String { t("طلباتي", "Mes commandes") }
     var tabSettings: String { t("الإعدادات", "Réglages") }
@@ -23,7 +23,7 @@ struct Strings {
     var activityFail: String { t("تعذر بدء النشاط الحي", "Impossible de démarrer l'activité en direct") }
 
     var orderNumber: String { t("رقم طلبك", "Votre numéro") }
-    var shopFallback: String { t("رنّلي", "Rennli") }
+    var shopFallback: String { "C'est Fait!" }
 
     func statusText(_ status: String) -> String {
         switch status {
@@ -83,7 +83,7 @@ struct Strings {
                              "Vous pouvez verrouiller — le ticket reste sur l'écran de verrouillage") }
     var followUs: String { t("تابعنا", "Suivez-nous") }
     var scanTitle: String { t("امسح الكود", "Scanner le code") }
-    var scanSub: String { t("وجّه الكاميرا على كود رنّلي", "Pointez la caméra sur un code Rennli") }
+    var scanSub: String { t("وجّه الكاميرا على كود C'est Fait!", "Pointez la caméra sur un code C'est Fait!") }
     var currentOrders: String { t("الحالية", "En cours") }
     var thanksTitle: String { t("شكراً لك!", "Merci !") }
     func rateLine(_ shop: String) -> String {

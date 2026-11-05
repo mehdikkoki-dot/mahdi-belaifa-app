@@ -9,7 +9,7 @@ settings:
     SWIFT_VERSION: "5.9"
     CODE_SIGNING_ALLOWED: NO
     CODE_SIGNING_REQUIRED: NO
-    MARKETING_VERSION: "10.0"
+    MARKETING_VERSION: "10.1"
     CURRENT_PROJECT_VERSION: "1"
 targets:
   Rennli:
@@ -24,9 +24,9 @@ targets:
     info:
       path: App/Info.plist
       properties:
-        CFBundleDisplayName: رنّلي
+        CFBundleDisplayName: C'est Fait!
         NSSupportsLiveActivities: true
-        NSCameraUsageDescription: رنّلي يحتاج الكاميرا لمسح كود الطلب الموجود على الوصل
+        NSCameraUsageDescription: C'est Fait! يحتاج الكاميرا لمسح كود الطلب الموجود على الوصل
         UIAppFonts:
           - cairo-400.ttf
           - cairo-700.ttf

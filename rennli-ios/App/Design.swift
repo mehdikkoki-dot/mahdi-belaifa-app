@@ -188,7 +188,7 @@ struct FrostedBar<Content: View>: View {
     }
 }
 
-/// «يعمل بواسطة رنّلي» with a tiny dot-grid mark.
+/// «Powered by C'est Fait!» with a tiny dot-grid mark.
 /// `dark` = sits on the red/dark scene (white text); otherwise grey on light.
 struct PoweredBy: View {
     let s: Strings
