@@ -130,13 +130,7 @@ final class TicketModel: ObservableObject {
         etaLive = state.etaLive
         offerText = state.offerText ?? ""
         voiceAnnounce = state.voiceAnnounce ?? true
-        let isNear = (state.near ?? false) && state.status == "waiting"
-        if isNear && !nearBuzzed {
-            nearBuzzed = true
-            AudioServicesPlaySystemSound(1519)
-        }
-        if !isNear && state.status != "waiting" { nearBuzzed = false }
-        near = isNear
+        near = false
         acked = state.acknowledgedAt != nil
         if status == "ready" && !acked {
             if !wasReady { beginRinging() }
@@ -562,21 +556,6 @@ struct WaitingView: View {
                     }
                 }
                 .entrance(0)
-                if model.near {
-                    HStack(spacing: 10) {
-                        Image(systemName: "flame.fill")
-                            .font(.system(size: 17)).foregroundStyle(Color(red: 0.85, green: 0.45, blue: 0.0))
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(s.nearTitle).font(.cairo(14.5, .black)).foregroundStyle(Color(red: 0.45, green: 0.25, blue: 0.0))
-                            Text(s.nearSub).font(.cairo(12.5)).foregroundStyle(Color(red: 0.45, green: 0.25, blue: 0.0).opacity(0.75))
-                        }
-                        Spacer()
-                    }
-                    .padding(16)
-                    .background(Color(red: 1.0, green: 0.95, blue: 0.85))
-                    .clipShape(RoundedRectangle(cornerRadius: 24))
-                    .entrance(0.04)
-                }
                 if !model.offerText.isEmpty {
                     VStack(alignment: .leading, spacing: 3) {
                         Label(s.offerTitle, systemImage: "tag.fill")
@@ -1067,7 +1046,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "9.0")
+                    LabeledContent(s.version, value: "9.1")
                 }
             }
             .navigationTitle(s.settingsTitle)
