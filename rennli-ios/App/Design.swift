@@ -380,6 +380,14 @@ struct AmbientBackground: View {
                 .frame(width: 260, height: 260)
                 .blur(radius: 80)
                 .offset(x: drift ? 130 : 90, y: drift ? 300 : 340)
+            ForEach(0..<10, id: \.self) { i in
+                Circle()
+                    .fill(Theme.gold.opacity(0.28))
+                    .frame(width: i % 3 == 0 ? 5 : 3, height: i % 3 == 0 ? 5 : 3)
+                    .offset(x: CGFloat((i * 67) % 340 - 170),
+                            y: CGFloat((i * 113) % 640 - 320) + (drift ? -26 : 0))
+                    .opacity(drift ? 0.9 : 0.35)
+            }
         }
         .ignoresSafeArea()
         .onAppear {

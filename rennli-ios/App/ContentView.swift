@@ -522,6 +522,7 @@ struct WhiteCard<Content: View>: View {
 struct WaitingView: View {
     @ObservedObject var model: TicketModel
     let s: Strings
+    @StateObject private var adsModel = AdsModel()
 
     var body: some View {
         ScrollView {
@@ -555,8 +556,15 @@ struct WaitingView: View {
                         }
                     }
                 }
+                .overlay(RoundedRectangle(cornerRadius: 24).stroke(
+                    LinearGradient(colors: [Theme.gold.opacity(0.65), Theme.gold.opacity(0.10)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1.1))
+                .shineSweep(radius: 24)
                 .entrance(0)
-                if !model.offerText.isEmpty {
+                if !adsModel.ads.isEmpty {
+                    AdCarouselView(ads: adsModel.ads, s: s)
+                        .entrance(0.06)
+                } else if !model.offerText.isEmpty {
                     VStack(alignment: .leading, spacing: 3) {
                         Label(s.offerTitle, systemImage: "tag.fill")
                             .font(.cairo(13, .black)).foregroundStyle(Theme.goldDeep)
@@ -601,6 +609,7 @@ struct WaitingView: View {
             .padding(.top, 16)
             .padding(.bottom, 20)
         }
+        .task { await adsModel.load() }
     }
 }
 
@@ -663,6 +672,9 @@ struct ReadyView: View {
                 .shadow(color: Theme.orange.opacity(model.flashOn ? 0.6 : 0.3),
                         radius: model.flashOn ? 32 : 18, y: 10)
                 .shineSweep(radius: 26)
+                .overlay(RoundedRectangle(cornerRadius: 26).stroke(
+                    LinearGradient(colors: [Color(red: 1, green: 0.85, blue: 0.4).opacity(0.85), Color(red: 1, green: 0.85, blue: 0.4).opacity(0.15)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1.2))
                 .scaleEffect((landed ? 1.0 : 1.07) * (model.ringing && model.flashOn ? 1.015 : 1.0))
                 .opacity(landed ? 1 : 0)
                 .opacity(model.flashOn ? 0.92 : 1.0)
@@ -1046,7 +1058,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "9.1")
+                    LabeledContent(s.version, value: "10.0")
                 }
             }
             .navigationTitle(s.settingsTitle)

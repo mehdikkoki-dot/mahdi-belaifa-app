@@ -101,6 +101,7 @@ struct Strings {
     var nearSub: String { t("ابقى قريب من الكاشير — دورك وصل تقريباً", "Restez près du comptoir") }
     var offerTitle: String { t("عرض اليوم", "Offre du jour") }
     var voiceAnnounceSetting: String { t("إعلان صوتي عند الجاهزية", "Annonce vocale quand c'est prêt") }
+    var adTag: String { t("إعلان", "Pub") }
     var clearAll: String { t("مسح الكل", "Tout effacer") }
     var clearConfirm: String { t("تمسح كل الطلبات من القائمة؟", "Effacer toutes les commandes de la liste ?") }
     var deleteWord: String { t("مسح", "Effacer") }
