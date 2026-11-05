@@ -51,7 +51,7 @@ final class TicketModel: ObservableObject {
 
     var onSync: ((StoredTicket) -> Void)?
 
-    private var timer: Timer?
+    private var pollTask: Task<Void, Never>?
     private var activity: Activity<TicketAttributes>?
     private var player: AVAudioPlayer?
     private var flashTimer: Timer?
@@ -78,9 +78,15 @@ final class TicketModel: ObservableObject {
     }
 
     private func startPolling() {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
-            Task { await self?.refresh() }
+        // Task loop, not Timer: a Timer scheduled off the main run loop
+        // (e.g. from the camera callback) never fires, which froze the
+        // screen on its first failed fetch.
+        pollTask?.cancel()
+        pollTask = Task { [weak self] in
+            while !Task.isCancelled {
+                await self?.refresh()
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+            }
         }
     }
 
@@ -97,6 +103,7 @@ final class TicketModel: ObservableObject {
     }
 
     private func apply(_ state: TicketState) {
+        error = ""
         let wasReady = (status == "ready")
         number = state.number
         status = state.status
@@ -116,7 +123,6 @@ final class TicketModel: ObservableObject {
         if status == "completed" || status == "cancelled" {
             Task { await endActivity() }
         } else {
-            error = ""
             Task { await updateActivity() }
         }
         onSync?(StoredTicket(id: ticketId, number: number,
@@ -187,7 +193,7 @@ final class TicketModel: ObservableObject {
     }
 
     func stopAll() {
-        timer?.invalidate()
+        pollTask?.cancel()
         stopRinging()
         Task { await endActivity() }
         ticketId = ""
@@ -960,7 +966,7 @@ struct SettingsView: View {
                 }
                 Section {
                     LabeledContent(s.device, value: String(AppModel.deviceId().prefix(8)).uppercased())
-                    LabeledContent(s.version, value: "6.3")
+                    LabeledContent(s.version, value: "6.4")
                 }
             }
             .navigationTitle(s.settingsTitle)
