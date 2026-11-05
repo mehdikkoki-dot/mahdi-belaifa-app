@@ -71,6 +71,7 @@ struct Strings {
     var device: String { t("معرّف الجهاز", "Identifiant de l'appareil") }
     var version: String { t("النسخة", "Version") }
 
+    var newTicket: String { t("تذكرة جديدة", "Nouveau ticket") }
     var scanButton: String { t("امسح كود الطلب", "Scanner le code") }
     var orPaste: String { t("ولا الصق الرابط", "ou collez le lien") }
     func etaText(_ m: Int) -> String { t("خلال \(m) دقيقة تقريباً", "dans environ \(m) min") }

@@ -111,8 +111,12 @@ final class TicketModel: ObservableObject {
         } else if ringing {
             stopRinging()
         }
-        Task { await updateActivity() }
-        if status == "completed" { Task { await endActivity() } }
+        if status == "completed" || status == "cancelled" {
+            Task { await endActivity() }
+        } else {
+            error = ""
+            Task { await updateActivity() }
+        }
         onSync?(StoredTicket(id: ticketId, number: number,
                               shop: shopName.isEmpty ? s.shopFallback : shopName,
                               status: status, addedAt: Date().timeIntervalSince1970))
@@ -121,6 +125,7 @@ final class TicketModel: ObservableObject {
     // MARK: Live Activity
 
     func startActivity() {
+        guard status == "waiting" || status == "ready" else { return }
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
             error = s.activitiesOff
             return
@@ -179,6 +184,15 @@ final class TicketModel: ObservableObject {
         player?.stop()
     }
 
+    func stopAll() {
+        timer?.invalidate()
+        stopRinging()
+        Task { await endActivity() }
+        ticketId = ""
+        status = ""
+        number = ""
+    }
+
     func ack() {
         guard let url = URL(string: "\(apiBase)/api/tickets/\(ticketId)/ack") else { return }
         var req = URLRequest(url: url)
@@ -229,6 +243,11 @@ final class AppModel: ObservableObject {
         guard !id.isEmpty else { return }
         selectedId = id
         detail.connect(rawInput: id)
+    }
+
+    func closeCurrent() {
+        selectedId = ""
+        detail.stopAll()
     }
 
     func select(_ t: StoredTicket) {
@@ -306,6 +325,8 @@ struct TicketTab: View {
                 ConnectView(app: app, s: s)
             } else if app.detail.status == "ready" {
                 ReadyView(model: app.detail, s: s)
+            } else if app.detail.status == "completed" || app.detail.status == "cancelled" {
+                CompletedView(app: app, model: app.detail, s: s)
             } else {
                 WaitingView(model: app.detail, s: s)
             }
@@ -413,9 +434,6 @@ struct WaitingView: View {
                 stepRow(done: true, current: false, label: s.stepReceived, symbol: "✓")
                 stepRow(done: false, current: true, label: s.stepCooking, symbol: "◐")
                 stepRow(done: false, current: false, label: s.stepReady, symbol: "3")
-            }
-            if model.status == "completed" {
-                RatingCard(model: model, s: s).padding(.top, 18)
             }
             if !model.error.isEmpty {
                 Text(model.error).font(.cairo(13)).foregroundStyle(.red).padding(.top, 10)
@@ -532,6 +550,46 @@ struct VenueLinks: View {
     }
 }
 
+struct CompletedView: View {
+    @ObservedObject var app: AppModel
+    @ObservedObject var model: TicketModel
+    let s: Strings
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ShopHeader(shop: model.shopName.isEmpty ? s.shopFallback : model.shopName,
+                       chip: s.statusShort(model.status))
+                .padding(.top, 18)
+            Spacer()
+            ZStack {
+                Circle().fill(Theme.orangeSoft).frame(width: 110, height: 110)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 52, weight: .black))
+                    .foregroundStyle(Theme.orange)
+            }
+            Text(s.statusText(model.status))
+                .font(.cairo(24, .black)).foregroundStyle(Theme.ink)
+                .padding(.top, 20)
+            Text(s.orderNumber)
+                .font(.cairo(14, .bold)).foregroundStyle(Theme.muted)
+                .padding(.top, 14)
+            HeroNumber(number: model.number, size: 84)
+            Spacer()
+            if model.status == "completed" {
+                RatingCard(model: model, s: s)
+            }
+            Button(s.newTicket) {
+                Haptics.tap()
+                app.closeCurrent()
+            }
+            .font(.cairo(17, .bold)).foregroundStyle(Theme.orangeDeep)
+            .padding(.top, 18)
+        }
+        .padding(.horizontal, 26)
+        .padding(.bottom, 22)
+    }
+}
+
 // MARK: - Rating
 
 struct RatingCard: View {
@@ -564,7 +622,7 @@ struct RatingCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(18)
-        .background(Theme.ink)
+        .background(Color(red: 0.169, green: 0.102, blue: 0.071))
         .clipShape(RoundedRectangle(cornerRadius: 24))
     }
 }
