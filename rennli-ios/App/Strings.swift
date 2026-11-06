@@ -112,6 +112,18 @@ struct Strings {
     var tiktok: String { t("تيك توك", "TikTok") }
     var map: String { t("الخريطة", "Plan") }
 
+    var loyaltyTitle: String { t("بطاقة الولاء", "Carte de fidélité") }
+    var loyaltyJoinLine: String { t("اجمع ختم مع كل طلب واربح مكافآت عند هذا المحل", "Un tampon par commande — gagnez des récompenses dans ce magasin") }
+    var loyaltyJoin: String { t("انضم للبطاقة", "Créer ma carte") }
+    var loyaltyName: String { t("الاسم", "Nom") }
+    var loyaltyPhone: String { t("رقم الهاتف", "Numéro de téléphone") }
+    var loyaltyJoinError: String { t("ما قدرناش نكملو الانضمام — تأكد من الاسم والهاتف", "Échec — vérifiez le nom et le téléphone") }
+    func loyaltyStamps(_ x: Int, _ y: Int) -> String { t("\(x) من \(y) أختام", "\(x) sur \(y) tampons") }
+    var loyaltyRewardReady: String { t("مكافأتك جاهزة — اطلبها من الكاشير", "Récompense prête — demandez-la au comptoir") }
+    var loyaltyAddWallet: String { t("أضف إلى Apple Wallet", "Ajouter à Apple Wallet") }
+    var loyaltyLinked: String { t("طلبك هذا يتحسّب ختم وحدو كي تستلمو", "Cette commande ajoutera un tampon à la récupération") }
+    func loyaltyCode(_ c: String) -> String { t("كودك: \(c)", "Votre code : \(c)") }
+
     static func current() -> Strings {
         Strings(lang: UserDefaults.standard.string(forKey: "lang") ?? "ar")
     }

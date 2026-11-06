@@ -26,6 +26,13 @@ struct TicketState: Decodable {
     let near: Bool?
     let offerText: String?
     let voiceAnnounce: Bool?
+    let loyalty: TicketLoyalty?
+}
+
+struct TicketLoyalty: Decodable {
+    let enabled: Bool
+    let goal: Int
+    let shopCode: String?
 }
 
 struct StoredTicket: Codable, Identifiable, Equatable {
@@ -53,6 +60,9 @@ final class TicketModel: ObservableObject {
     @Published var near: Bool = false
     @Published var offerText: String = ""
     @Published var voiceAnnounce: Bool = true
+    @Published var loyaltyEnabled: Bool = false
+    @Published var loyaltyGoal: Int = 8
+    @Published var shopCode: String = ""
     private var nearBuzzed = false
     private let synth = AVSpeechSynthesizer()
     @Published var status: String = ""        // waiting | ready | completed
@@ -130,6 +140,11 @@ final class TicketModel: ObservableObject {
         etaLive = state.etaLive
         offerText = state.offerText ?? ""
         voiceAnnounce = state.voiceAnnounce ?? true
+        if let loy = state.loyalty {
+            loyaltyEnabled = loy.enabled
+            loyaltyGoal = loy.goal
+            if let sc = loy.shopCode, !sc.isEmpty { shopCode = sc }
+        }
         near = false
         acked = state.acknowledgedAt != nil
         if status == "ready" && !acked {
@@ -606,6 +621,10 @@ struct WaitingView: View {
                     .padding(-4)
                 }
                 .entrance(0.08)
+                if model.loyaltyEnabled && !model.shopCode.isEmpty {
+                    LoyaltyCardView(model: model, s: s)
+                        .entrance(0.12)
+                }
                 VenueLinks(model: model, s: s)
                     .entrance(0.16)
                 PoweredBy(s: s)
@@ -842,6 +861,10 @@ struct CompletedView: View {
                             }
                             .padding(18)
                         }
+                    }
+                    if model.loyaltyEnabled && !model.shopCode.isEmpty {
+                        LoyaltyCardView(model: model, s: s)
+                            .entrance(0.18)
                     }
                     VenueLinksDark(model: model, s: s)
                         .entrance(0.2)
