@@ -115,9 +115,11 @@ struct Strings {
     var loyaltyTitle: String { t("بطاقة الولاء", "Carte de fidélité") }
     var loyaltyJoinLine: String { t("اجمع ختم مع كل طلب واربح مكافآت عند هذا المحل", "Un tampon par commande — gagnez des récompenses dans ce magasin") }
     var loyaltyJoin: String { t("انضم للبطاقة", "Créer ma carte") }
-    var loyaltyName: String { t("الاسم", "Nom") }
-    var loyaltyPhone: String { t("رقم الهاتف", "Numéro de téléphone") }
-    var loyaltyJoinError: String { t("ما قدرناش نكملو الانضمام — تأكد من الاسم والهاتف", "Échec — vérifiez le nom et le téléphone") }
+    var loyaltyGetCard: String { t("احصل على بطاقتي", "Obtenir ma carte") }
+    var loyaltyAddGoogle: String { t("أضف إلى Google Wallet", "Ajouter à Google Wallet") }
+    var loyaltyRewardLabel: String { t("المكافأة", "Récompense") }
+    func loyaltyMemberNo(_ c: String) -> String { t("رقم العضوية \(c)", "N° de membre \(c)") }
+    var loyaltyJoinError: String { t("ما قدرناش نكملو الانضمام — عاود المحاولة", "Échec — réessayez") }
     func loyaltyStamps(_ x: Int, _ y: Int) -> String { t("\(x) من \(y) أختام", "\(x) sur \(y) tampons") }
     var loyaltyRewardReady: String { t("مكافأتك جاهزة — اطلبها من الكاشير", "Récompense prête — demandez-la au comptoir") }
     var loyaltyAddWallet: String { t("أضف إلى Apple Wallet", "Ajouter à Apple Wallet") }
