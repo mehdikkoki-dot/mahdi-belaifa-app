@@ -40,3 +40,4 @@
 - النسخة 2 (الاتجاه 2): بانتظار تثبيت صاحب المشروع وتأكيده.
 
 <!-- build retry 2026-11-06: runner not acquired on previous run -->
+<!-- build retry 2 -->
