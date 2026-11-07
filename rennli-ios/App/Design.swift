@@ -248,7 +248,7 @@ struct BrandWordmark: View {
     var size: CGFloat = 20
     var color: Color = .white
     var body: some View {
-        Text("C'est Fait!")
+        Text(PlatformName.current)
             .font(.system(size: size, weight: .black))
             .italic()
             .foregroundStyle(color)

@@ -31,6 +31,7 @@ struct BrandBundle: Decodable {
     let poweredBy: Bool?
     let googleWallet: Bool?
     let moduleEnabled: Bool?
+    let platformName: String?
 }
 
 // MARK: - Loyalty API
@@ -100,6 +101,11 @@ final class LoyaltyStore: ObservableObject {
             let decoded = try JSONDecoder().decode(BrandBundle.self, from: data)
             brandCache[shopCode] = decoded
             brand = decoded
+            // The platform display name is ONE server setting; cache the
+            // latest value so every screen renders it (fallback in Strings).
+            if let pn = decoded.platformName, !pn.isEmpty {
+                UserDefaults.standard.set(pn, forKey: "cf_platform_name")
+            }
         } catch {}
     }
 
